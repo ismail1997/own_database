@@ -51,8 +51,6 @@ public class Main {
 					String keyWord =StatementTools.getFirstKeyWordFromStatement(statement);
 					//check if the keyWord is a reserved word
 					boolean check = StatementTools.checkIfFirstKeyWordIsResevedWord(keyWord);
-					
-					//System.out.println(check);
 					if(!check) {
 						System.out.println("Syntax Error, statement should start with a valid keyword");
 					}else {

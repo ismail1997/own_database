@@ -12,7 +12,8 @@ import lombok.ToString;
 public class Table implements Serializable{
 
 	private static final long serialVersionUID = 2386231852869108805L;
-	private String title ;
+	private String tableName ;
+	private String database ;
 	private int numberOfColumns =0;
 	private HashMap<String, String> fields ;
 }
