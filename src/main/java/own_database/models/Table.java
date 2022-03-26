@@ -1,0 +1,18 @@
+package own_database.models;
+
+import java.io.Serializable;
+import java.util.HashMap;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data @ToString @AllArgsConstructor @NoArgsConstructor
+public class Table implements Serializable{
+
+	private static final long serialVersionUID = 2386231852869108805L;
+	private String title ;
+	private int numberOfColumns =0;
+	private HashMap<String, String> fields ;
+}
