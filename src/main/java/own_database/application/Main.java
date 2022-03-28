@@ -1,42 +1,24 @@
 package own_database.application;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.OutputStreamWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+
 import java.util.Scanner;
 
-import own_database.utils.Constants;
-import own_database.utils.CryptoUtils;
-import own_database.utils.Tools;
-import own_database.utils.databaseTools.DatabaseTools;
 import own_database.utils.statementsTools.CreateStatementTools;
 import own_database.utils.statementsTools.DropStatementTools;
 import own_database.utils.statementsTools.ShowStatementTools;
 import own_database.utils.statementsTools.StatementTools;
+import own_database.utils.statementsTools.UseStatementTools;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		
-
-
-		
 
 			Scanner scanner= new Scanner(System.in);
 			String statement = "";
 			
 			boolean endOfProgram = false;
+			
+			UseStatementTools.clearCurrentSession();
 			
 			while(!endOfProgram)
 			{
@@ -54,7 +36,9 @@ public class Main {
 					if(!check) {
 						System.out.println("Syntax Error, statement should start with a valid keyword");
 					}else {
-						if(keyWord.toLowerCase().equals("create")) {
+						if (keyWord.toLowerCase().equals("use")) {
+							UseStatementTools.validUseStatememt(statement);
+						}else if(keyWord.toLowerCase().equals("create")) {
 							CreateStatementTools.validCreateStatement( statement);
 						}else if(keyWord.toLowerCase().equals("drop")) {
 							DropStatementTools.validDropStatement(statement);
@@ -65,6 +49,7 @@ public class Main {
 				}
 				
 			}
+			scanner.close();
  
 		
 	}

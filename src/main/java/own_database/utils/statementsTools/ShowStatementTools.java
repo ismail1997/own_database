@@ -7,6 +7,12 @@ import own_database.utils.databaseTools.DatabaseTools;
 
 public class ShowStatementTools {
 	
+	/**
+	 * 
+	 * @param statement
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean validShowStatement(String statement) throws Exception {
 		if(statement.equals(null) || statement.equals("")) return false;
 		String array [] = statement.trim().split(" ");
@@ -44,7 +50,11 @@ public class ShowStatementTools {
 		
 		return false;
 	}
-	
+	/**
+	 * 
+	 * @param keyWord
+	 * @return
+	 */
 	public static boolean checkIfShowIsNotFollowedWithUnvalidKeyWord(String keyWord) {
 		List<String> validKeyWordsForDropStatement = Arrays.asList("tables","databases");
 		if(!validKeyWordsForDropStatement.contains(keyWord)) {

@@ -3,10 +3,17 @@ package own_database.utils.statementsTools;
 import java.util.Arrays;
 import java.util.List;
 
+import own_database.models.Database;
 import own_database.utils.Constants;
 import own_database.utils.databaseTools.DatabaseTools;
 
 public class CreateStatementTools {
+	/**
+	 * 
+	 * @param statement
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean validCreateStatement(String statement) throws Exception {
 		if(statement.equals(null) || statement.equals("")) return false;
 		String array [] = statement.trim().split(" ");
@@ -45,7 +52,13 @@ public class CreateStatementTools {
 			switch(array[1]) {
 				case "table" :{
 					String tableName = array[2];
-					//first check if the name is already exist or not 
+					//first check if the user selected the database
+					String currentDb = UseStatementTools.getTheCurrentSessionDatabase();
+					
+					if(currentDb.equals("") || currentDb.equals(null)) {
+						System.out.println("No database selected");
+						return false; 
+					}
 					
 					break;
 				}
@@ -60,8 +73,10 @@ public class CreateStatementTools {
 							System.out.println("database name is too long, please use names less than 25 characters");
 							return false ;
 						}
-						DatabaseTools.createDatabase(dbName);
-							System.out.println("database created successfully");
+						Database database = new Database();
+						database.setDatabaseName(dbName);
+						DatabaseTools.createDatabase(database);
+						System.out.println("database created successfully");
 					}
 					
 					break;
@@ -77,6 +92,11 @@ public class CreateStatementTools {
 		
 		return false;
 	}
+	/**
+	 * 
+	 * @param keyWord
+	 * @return
+	 */
 	public static boolean checkIfCreateIsNotFollowedWithUnvalidKeyWord(String keyWord) {
 		List<String> validKeyWordsForCreateStatement = Arrays.asList("table","view","database");
 		if(!validKeyWordsForCreateStatement.contains(keyWord)) {

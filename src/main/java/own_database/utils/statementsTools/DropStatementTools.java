@@ -7,10 +7,15 @@ import own_database.utils.Constants;
 import own_database.utils.databaseTools.DatabaseTools;
 
 public class DropStatementTools {
+	/**
+	 * 
+	 * @param statement
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean validDropStatement(String statement) throws Exception {
 		if(statement.equals(null) || statement.equals("")) return false;
 		String array [] = statement.trim().split(" ");
-		
 		if(array.length==1) {
 			System.out.println("drop statement necessite more arguments :(");
 			return false;
@@ -60,6 +65,13 @@ public class DropStatementTools {
 		return false;
 		
 	}
+	
+	
+	/**
+	 * 
+	 * @param keyWord
+	 * @return
+	 */
 	public static boolean checkIfDropIsNotFollowedWithUnvalidKeyWord(String keyWord) {
 		List<String> validKeyWordsForDropStatement = Arrays.asList("table","database");
 		if(!validKeyWordsForDropStatement.contains(keyWord)) {
