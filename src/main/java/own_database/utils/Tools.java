@@ -11,6 +11,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import own_database.utils.databaseTools.DatabaseTools;
 
@@ -47,5 +49,25 @@ public class Tools {
 		char[] chars = new char[n];
 		Arrays.fill(chars, c);
 		return new String(chars);
+	}
+	
+	//check if string started with number or character 
+	public static boolean checkIfStringStartedWithNumberOrChar(String inputString) {
+		
+		if(Character.isDigit(inputString.charAt(0))) return true;
+		
+		Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+		Matcher m = p.matcher(inputString);
+		boolean b = m.find();
+		
+		if (b) {
+			return true;
+		}
+
+		return false ;
+	}
+	
+	public static void main(String[] args) {
+
 	}
 }

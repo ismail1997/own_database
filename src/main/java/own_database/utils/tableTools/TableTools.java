@@ -17,22 +17,30 @@ public class TableTools {
 		return false ;
 	}
 	
+	
 	public static void main(String [] args) {
 		
 		Table table = new Table();
 		HashMap<String, String> mapOfFields = new HashMap<String, String>();
 		
 		
-		String createTableString ="create  table ismail ( id int , text String , age date,kora date, jee date ) ;";
+		String createTableString ="create  table ismail (   23 int , 43 String , 34 date,342 date, jee date    ) ;  ";
 		createTableString =createTableString.replaceAll("\\s+"," ");
 		String array [] = createTableString.split("\\(");
+		
+		if(array.length != 2) {
+			System.out.println("invalid create table statement");
+			return ;
+		}
 		
 		String firstStatement = array[0].trim().toLowerCase() ;
 		System.out.println(firstStatement);
 		
 		//validate the first statement 
 		String arrayOfFirstStm [] = firstStatement.split(" ");
-		if(arrayOfFirstStm.length != 3) System.out.println("invalid statement");
+		if(arrayOfFirstStm.length != 3) {
+			System.out.println("invalid statement");
+		}
 		
 		//check if the the third string is not a reserved word
 		if(Constants.reservedWords().contains(arrayOfFirstStm[2])) {
@@ -53,10 +61,16 @@ public class TableTools {
 		String splitSecondStatement [] = secondStatement.split("\\)");
 		
 		if(splitSecondStatement.length != 2) {
-			System.out.println("invalid end of statement ");
+			System.out.println("invalid create table statement"); return ;
 		}
-		if (!splitSecondStatement[1].equals(";")) {
+		
+		if(splitSecondStatement[0].trim().length()==0) {
+			System.out.println("invalid create table, missing arguments");
+			return ;
+		}
+		if (!splitSecondStatement[1].trim().equals(";")) {
 			System.out.println("invalid end of statement, missing ';' ");
+			return;
 		}
 		System.out.println("------------------------");
 		ArrayList<String> createdFields = new ArrayList<String>();
