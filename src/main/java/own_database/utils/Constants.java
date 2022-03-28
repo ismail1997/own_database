@@ -7,6 +7,7 @@ import java.util.List;
 public class Constants {
 	public static final String DATABASE_FILE="database.owndb";
 	public static final String DATABASE_CURRENT="crdb.owndb";
+	public static final String TABLES_FILES="tb.owndb";
 	
 	public Constants() {
 

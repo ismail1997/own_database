@@ -18,20 +18,9 @@ import own_database.utils.databaseTools.DatabaseTools;
 
 public class Tools {
 
-	public static void writeToFile(String data , String fileName) throws Exception {
-		File fout = new File(fileName+".jbs");
-		
-		FileWriter fw = new FileWriter(fout,true);
-		
-		BufferedWriter bw = new BufferedWriter(fw);
-	 
-		bw.write(data);
-		bw.newLine();
-	 
-		bw.close();
-	}
+
 	
-	public static void writeToFileVersion2(String data , String fileName) throws Exception {
+	public static void writeToFile(String data , String fileName) throws Exception {
 		File fout = new File(fileName);
 		
 		FileWriter fw = new FileWriter(fout,true);

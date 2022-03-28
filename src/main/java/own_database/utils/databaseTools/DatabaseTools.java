@@ -110,7 +110,7 @@ public class DatabaseTools {
 		String encodedDataBaseName = CryptoUtils.encryptData(formatOfSavingDatabase);
 		if (encodedDataBaseName.equals(null) || encodedDataBaseName.equals(""))
 			return false;
-		Tools.writeToFileVersion2(encodedDataBaseName, Constants.DATABASE_FILE);
+		Tools.writeToFile(encodedDataBaseName, Constants.DATABASE_FILE);
 		return true;
 	}
 	

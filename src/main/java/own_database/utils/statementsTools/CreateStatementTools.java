@@ -6,6 +6,7 @@ import java.util.List;
 import own_database.models.Database;
 import own_database.utils.Constants;
 import own_database.utils.databaseTools.DatabaseTools;
+import own_database.utils.tableTools.TableTools;
 
 public class CreateStatementTools {
 	/**
@@ -59,7 +60,7 @@ public class CreateStatementTools {
 						System.out.println("No database selected");
 						return false; 
 					}
-					
+					TableTools.createTable(statement,currentDb);
 					break;
 				}
 				case "database" :{
