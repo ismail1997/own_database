@@ -52,7 +52,7 @@ public class Tools {
 	}
 	
 	//check if string started with number or character 
-	public static boolean checkIfStringStartedWithNumberOrChar(String inputString) {
+	public static boolean checkIfStringContainsWithNumberOrChar(String inputString) {
 		
 		if(Character.isDigit(inputString.charAt(0))) return true;
 		

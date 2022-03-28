@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import own_database.models.Table;
 import own_database.utils.Constants;
+import own_database.utils.Tools;
 
 public class TableTools {
 	public static void descriptTable(Table table) {
@@ -83,6 +84,11 @@ public class TableTools {
 			}else {
 				String nameOfField = fieldExtraction[0];
 				String typeOfField = fieldExtraction[1];
+				
+				if(Tools.checkIfStringContainsWithNumberOrChar(nameOfField)) {
+					System.out.println("invalid field names, it contains special characters or started with numbers");
+					return ;
+				}
 				
 				//check if the field is not repeated in the table creation
 				if(createdFields.contains(nameOfField)) {
