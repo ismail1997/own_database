@@ -44,6 +44,8 @@ public class Main {
 							DropStatementTools.validDropStatement(statement);
 						}else if(keyWord.toLowerCase().equals("show")) {
 							ShowStatementTools.validShowStatement(statement);
+						}else if(keyWord.toLowerCase().equals("desc")) {
+							
 						}
 					}
 				}

@@ -15,6 +15,7 @@ import own_database.models.Table;
 import own_database.utils.Constants;
 import own_database.utils.CryptoUtils;
 import own_database.utils.Tools;
+import own_database.utils.databaseTools.DatabaseTools;
 
 public class TableTools {
 	public static void descriptTable(Table table) {
@@ -25,6 +26,27 @@ public class TableTools {
 		Tools.writeToFile(CryptoUtils.encryptData(table.toString()), Constants.TABLES_FILES);
 	}
 
+	
+	public static boolean checkIfTableExistAlreadyInDb(String tableName,String dbName) throws Exception {
+		Table table = getTable(tableName);
+		if( table ==null) return false;
+		
+		if(table.getDatabase().equals(dbName)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static Table getTable(String tableName) throws Exception {
+		for(Table t : getListOfTable()) {
+			if(t.getTableName().equals(tableName)) {
+				return t;
+			}
+		}
+		return null;
+	}
+	
 	public static boolean createTable(String statement,String databaseName) throws Exception {
 		Table table = new Table();
 		HashMap<String, String> mapOfFields = new HashMap<String, String>();
@@ -52,7 +74,7 @@ public class TableTools {
 			System.out.format("invalid table name, '%s' is a reserved word %n", arrayOfFirstStm[2]);
 			return false;
 		}
-		// check if table nambe contains or started with special characters or numbers
+		// check if table name contains or started with special characters or numbers
 		if (Tools.checkIfStringContainsWithNumberOrChar(arrayOfFirstStm[2])) {
 			System.out.format("invalid table name ,'%s' shouldn't contain anay special characters or numbers",
 					arrayOfFirstStm[2]);
@@ -60,9 +82,15 @@ public class TableTools {
 		}
 		String nameOfTable = arrayOfFirstStm[2];
 
+		
+		//check if the table exist already on the database 
+		if(checkIfTableExistAlreadyInDb(nameOfTable,databaseName)) {
+			System.out.format("Table '%s' already exists%n",nameOfTable);
+			return false;
+		}
 		// assign the name to the table object
 		table.setTableName(nameOfTable);
-		table.setDatabase("");
+		table.setDatabase(databaseName);
 
 		String secondStatement = array[1].trim().toLowerCase();
 
@@ -131,7 +159,9 @@ public class TableTools {
 		}
 		table.setNumberOfColumns(mapOfFields.size());
 		table.setFields(mapOfFields);
+		DatabaseTools.addTableDatabase(table.getDatabase(), table.getTableName());
 		writeTableToFile(table);
+		System.out.format("Query OK, '%s' created successfully %n",table.getTableName());
 		return true;
 	}
 

@@ -19,27 +19,12 @@ public class CreateStatementTools {
 		if(statement.equals(null) || statement.equals("")) return false;
 		String array [] = statement.trim().split(" ");
 		
-		if(array.length==1) {
-			System.out.println("Create statement necessite more arguments :(");
-			return false;
-		}else if(array.length==2) {
-			System.out.println("Create statement necessit more arguments :(");
-			return false;
-		}else if(array.length==3) {
-			System.out.println("Create statement necessit more arguments :(");
-			return false;
-		}else if(array.length >4) {
-			System.out.println("invalid end of create statement");
-			return false;
-		}
+
 		
 		if(!checkIfCreateIsNotFollowedWithUnvalidKeyWord(array[1])) {
 			System.out.println("not cool , not fucking cool , you do not know how not cool that shit is");
 		}else {
-			//System.out.println("valid create "+array[1]);
-			//now after that we checked that create table or database is valid, we should check if
-			// table or database or view is already exist 
-			//also check if the name starts with valid characters 
+			
 			if(StatementTools.checkIfUnvalidName(array[2]))
 			{
 				System.out.println("unvalid name,"+array[1]+" name shouldn't start with digit or characters");
@@ -99,10 +84,11 @@ public class CreateStatementTools {
 	 * @return
 	 */
 	public static boolean checkIfCreateIsNotFollowedWithUnvalidKeyWord(String keyWord) {
-		List<String> validKeyWordsForCreateStatement = Arrays.asList("table","view","database");
-		if(!validKeyWordsForCreateStatement.contains(keyWord)) {
+		if(!Arrays.asList("table","view","database").contains(keyWord)) {
 			return false;
 		}
 		return true;
 	}
+	
+	
 }

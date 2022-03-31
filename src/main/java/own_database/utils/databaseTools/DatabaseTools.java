@@ -184,6 +184,27 @@ public class DatabaseTools {
 		return null;
 	}
 	
+	public static void showTablesOfDatabase(String dbName) throws Exception {
+		Database database = getDatabase(dbName);
+		if(database == null) return ;
+		
+		List<String> listOfTables = database.getListOfTables();
+		OptionalInt oi = listOfTables.stream()
+                .mapToInt(String::length)
+                .max();
+		int sizeOfStringFormat=oi.getAsInt();
+		sizeOfStringFormat = sizeOfStringFormat < dbName.length() ? dbName.length() : sizeOfStringFormat;
+		String format = "| %-" + sizeOfStringFormat + "s |%n";
+		System.out.println("+-" + Tools.repeatedString('-', sizeOfStringFormat) + "-+");
+		System.out.println("| "+dbName + Tools.repeatedString(' ', sizeOfStringFormat - dbName.length()) + " |");
+		System.out.println("+-" + Tools.repeatedString('-', sizeOfStringFormat) + "-+");
+		for (String string : listOfTables) {
+			System.out.format(format, string);
+		}
+		System.out.println("+-" + Tools.repeatedString('-', sizeOfStringFormat) + "-+");
+		System.out.println(getListOfDatabases().size() + " rows in set");
+	}
+	
 	/**
 	 * 
 	 * @param databaseName
@@ -233,20 +254,19 @@ public class DatabaseTools {
 		for(Database db : listOfDatabase) {
 			createDatabase(db);
 		}
-		System.out.println("database updated successfully");
+		
 		return true;
 	}
 	
 
 	
 	public static void main(String[] args) throws Exception {
-		//String db="header@ismail,bouaddi,gee";
-		
-		System.out.println(" ....................... ");
-		 showDatabases();
-		 dropDatabase("http");showDatabases();
+		 //showDatabases();
+		// dropDatabase("http");showDatabases();
 		//System.out.println(getDatabase("dfsd"));
 		//addTableDatabase("persons", "           ");
+		showTablesOfDatabase("alpha");
+		
 		//getListOfDatabases().forEach(System.out::println);
 	//	Database database = new Database();
 	//	database.setDatabaseName("roles");
