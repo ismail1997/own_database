@@ -16,7 +16,7 @@ public class Constants {
 	public static List<String> reservedWords(){
 		return Arrays.asList("select","insert","delete","update","create",
 				"from","where","*","not","null","database","auto_increment","date","char",
-				"int","string","double","drop","show","truncate","databases","table");
+				"int","string","double","drop","show","truncate","databases","table","use","fg","pk");
 	}
 	
 	public static List<String> reservedTypes(){

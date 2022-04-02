@@ -2,6 +2,7 @@ package own_database.models;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,4 +17,5 @@ public class Table implements Serializable{
 	private String database ;
 	private int numberOfColumns =0;
 	private HashMap<String, String> fields ;
+	private List<Field> listOfFields;
 }

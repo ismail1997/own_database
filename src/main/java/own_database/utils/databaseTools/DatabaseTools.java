@@ -225,7 +225,7 @@ public class DatabaseTools {
 		List<String> tablesOfGivenDatabase = oldDatabase.getListOfTables();
 		//check if table already exist or not 
 		if(tablesOfGivenDatabase.contains(tableNameToAdd)) {
-			System.out.println("table already exist");return false;
+			System.out.format("table '%s' is already exist%n",tableNameToAdd);return false;
 		}
 		if(tableNameToAdd.trim().equals("")) {
 			System.out.println("invalid name of table");return false;

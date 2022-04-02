@@ -28,14 +28,9 @@ public class TableTools {
 
 	
 	public static boolean checkIfTableExistAlreadyInDb(String tableName,String dbName) throws Exception {
-		Table table = getTable(tableName);
+		Table table = getTable(tableName,dbName);
 		if( table ==null) return false;
-		
-		if(table.getDatabase().equals(dbName)) {
-			return true;
-		}
-		
-		return false;
+		return true;
 	}
 	
 	public static Table getTable(String tableName) throws Exception {
@@ -43,6 +38,13 @@ public class TableTools {
 			if(t.getTableName().equals(tableName)) {
 				return t;
 			}
+		}
+		return null;
+	}
+	
+	public static Table getTable(String tableName, String dbName) throws Exception {
+		for(Table t : getListOfTable()) {
+			if(t.getDatabase().equals(dbName) && t.getTableName().equals(tableName)) return t;
 		}
 		return null;
 	}
@@ -159,7 +161,10 @@ public class TableTools {
 		}
 		table.setNumberOfColumns(mapOfFields.size());
 		table.setFields(mapOfFields);
-		DatabaseTools.addTableDatabase(table.getDatabase(), table.getTableName());
+		boolean addTableToDatabase =DatabaseTools.addTableDatabase(table.getDatabase(), table.getTableName());
+		if(!addTableToDatabase) {
+			return false;
+		}
 		writeTableToFile(table);
 		System.out.format("Query OK, '%s' created successfully %n",table.getTableName());
 		return true;
@@ -216,9 +221,167 @@ public class TableTools {
 	}
 
 	public static void main(String[] args) throws Exception {
-		//System.out.println(createTable("create table  jee ( sd int , sophos string , wd int , alpha double) ;"));
+		String tbStatement ="   CREATE  table usex ( id int pk, sd string , isd int fg[sdf:id] , swatid int fg[sbouaddi:id]);   ";
+		
+		tbStatement = tbStatement.trim().replaceAll("\\s+", " ").toLowerCase();//trim all white spaces and replace it with single white space
 
-		getListOfTable().forEach(System.out::println);
+		String [] splitTbStatement=tbStatement.trim().split("\\(");	//split the table create statement into two string 
+
+		
+		if(splitTbStatement.length!=2) {//check if the split array is of size 2 
+			System.out.println("invalid create table statement");
+			return;
+		}
+		/*****
+		 * check the first split 
+		*/
+		String [] firstElementOfCreateTable = splitTbStatement[0].trim().split(" ");
+		if(firstElementOfCreateTable.length!=3) {//check if the first array is of size 3 ( create keyword, table keyword and table_name )
+			System.out.println("invalid create table statement, missing arguments");
+			return ;
+		}
+		
+		if(!firstElementOfCreateTable[0].toLowerCase().equals("create")) {//check if the first keyword is 'create'
+				System.out.println("syntax error, check the manual of db_own");return ;
+		}
+		if(!firstElementOfCreateTable[1].toLowerCase().equals("table")) {//check if the second keyword is 'table'
+			System.out.printf("invalid create statement, '%s' is not a valid keyword; check the manual of the db_won\n",firstElementOfCreateTable[1]);return;
+		}
+		
+		
+		if(Constants.reservedWords().contains(firstElementOfCreateTable[2]) ) {//check if name of table is not a reserved word or 
+			System.out.printf("invalid table name, '%s' is a reserved keyword of db_own",firstElementOfCreateTable[2]);return ;
+		}
+		
+		if(Tools.checkIfStringContainsWithNumberOrChar(firstElementOfCreateTable[2])) {//check if table name contains any special character or started with number
+			System.out.printf("invalid table name '%s', check the manual of db_own",firstElementOfCreateTable[2]);return ;
+		}
+		
+		/*****
+		 * check the second split 
+		*/
+		String [] splitToExtractTheFieldsAndEndStatement = splitTbStatement[1].split("\\)");
+		
+		if(splitToExtractTheFieldsAndEndStatement.length !=2) {//check if the length of the second split is equal to 2 
+			System.out.println("invalid create table statement, check the manual of own_db");return;
+		}
+		
+		
+		if(!splitToExtractTheFieldsAndEndStatement[1].equals(";")) {//check if the statement ends with ';'
+			System.out.println("invalid end of statement, missing ';' at the end");return;
+		}
+		
+		String fields = splitToExtractTheFieldsAndEndStatement[0].trim();
+		String [] splitFields = fields.split(",");
+		
+		ArrayList<String> createdFieldsAllReady = new ArrayList<String>();//to prevent the duplicate fields
+		ArrayList<String> duplicatedPrimaryKeys = new ArrayList<String>();//to prevent the duplicate primary key
+		ArrayList<String> duplicatedForeignKeys = new ArrayList<String>();//to prevent duplicate of the same foreing key
+		
+		for(String str : splitFields) {
+			str=str.trim();
+			String splitFlds [] = str.split(" ");
+			
+			if(splitFlds.length==1) {
+				System.out.println("syntax error, invalid fields of create table; check the manual of db_own");return;
+			}else if(splitFlds.length==2) {// Example : id string
+				//for the column name
+				if(Constants.reservedWords().contains(splitFlds[0])) {//check if the column name is not a reserved word
+					System.out.format("invalid statement, '%s' is a reserved word of own_db%n",splitFlds[0]);return;
+				}
+				if(Tools.checkIfStringContainsWithNumberOrChar(splitFlds[0])) {//check if the column name doens't not start with special character or starts with numbers
+					System.out.println("invalid colummn name, '%s' is not a valid name; check the manuel of db_own");return;
+				}
+				if(createdFieldsAllReady.contains(splitFlds[0])) {//check if the field is created already or not 
+					System.out.printf("syntax error, Duplicate column name '%s' \n",splitFlds[0]);
+					return;
+				}
+				//for the column type 
+				if(!Constants.reservedTypes().contains(splitFlds[1])) {//check if the column type is a valid type
+					System.out.printf("invalid statement, '%s' is not a valid type of own_db\n",splitFlds[1]);return;
+				}
+				
+				createdFieldsAllReady.add(splitFlds[0]);//adding the column name to the created fields list
+				//TODO adding field to the table object 
+
+			}else if(splitFlds.length==3) { //example : id integer pk or | groupid int fg[table_name:key]
+				if(Constants.reservedWords().contains(splitFlds[0])) {//check if the column name is not a reserved word
+					System.out.format("invalid statement, '%s' is a reserved word of own_db%n",splitFlds[0]);return;
+				}
+				if(Tools.checkIfStringContainsWithNumberOrChar(splitFlds[0])) {//check if the column name doens't not start with special character or starts with numbers
+					System.out.println("invalid colummn name, '%s' is not a valid name; check the manuel of db_own");return;
+				}
+				if(createdFieldsAllReady.contains(splitFlds[0])) {//check if the field is created already or not 
+					System.out.printf("syntax error, Duplicate column name '%s' \n",splitFlds[0]);
+					return;
+				}
+				
+				createdFieldsAllReady.add(splitFlds[0]);//adding the column name to the created fields list
+				
+				//for the column type 
+				if(!Constants.reservedTypes().contains(splitFlds[1])) {//check if the column type is a valid type
+					System.out.printf("invalid statement, '%s' is not a valid type of own_db\n",splitFlds[1]);return;
+				}
+				
+				if(!splitFlds[1].equals("int")) {//check if the column type is int 
+					System.out.format("error : only 'int' type are allowed to be primary or foreing keys not '%s'; check the manual of db_own%n",splitFlds[1]);return;
+				}
+				if(!splitFlds[2].startsWith("pk") && !splitFlds[2].startsWith("fg")) {//pk indicates the primary key, and fg indicates foreing_key
+					System.out.format("invalid references '%s', please check the manual of own_db",splitFlds[2]);return;
+				}
+			
+				if(splitFlds[2].startsWith("pk")) {//if the field is declared as primary key
+					
+					if(duplicatedPrimaryKeys.contains(splitFlds[2])) {//check if the primary key is already registered 
+						System.out.println("duplicate primary key, please check the manual of own_db");return;
+					}
+					
+					duplicatedPrimaryKeys.add(splitFlds[2]);//add the primary key to the list, to track duplication
+				
+				}else if(splitFlds[2].startsWith("fg")) {//check if the field is declared as foreign key
+				
+					String foreing_key=splitFlds[2].replace("fg[", "").replace("]", "");
+					String splitFg [] = foreing_key.split(":");
+					
+					if(duplicatedForeignKeys.contains(foreing_key)) {
+						System.out.format("duplicate of the same foreing key '%s', please check the manual of own_db%n",foreing_key);return;
+					}
+
+					if(splitFg.length != 2) {
+						System.out.format("invalid foreing key '%s', please check the manual of own_db%n",foreing_key);return;
+					}
+					
+					String fgTableName = splitFg[0].trim();
+					String fgTableColumn = splitFg[1].trim();
+					
+					if(Constants.reservedWords().contains(fgTableName)) {//check if the foreign table is not a reserved word
+						System.out.format("invalid foreign table name, '%s' is a reserved word for own_db%n", fgTableName);return;
+					}
+					if(Tools.checkIfStringContainsWithNumberOrChar(fgTableName)) {//check if the table name doesn't start with a number or has any special character on it
+						System.out.format("invalid table name '%s', check the manual of db_own%n",fgTableName);return;
+					}
+					if(Constants.reservedWords().contains(fgTableColumn)) {//check if the foreign table column is not a reserved word
+						System.out.format("invalid foreign column name, '%s' is a reserved word for own_db%n", fgTableColumn);return;
+					}
+					if(Tools.checkIfStringContainsWithNumberOrChar(fgTableColumn)) {//check if the table column name doesn't start with a number or has any special character on it
+						System.out.format("invalid column name '%s', check the manual of db_own%n",fgTableColumn);return;
+					}
+					
+					
+					duplicatedForeignKeys.add(foreing_key);
+					
+					
+					//TODO check if foreign table is exist or not and check if it has the column
+				}
+				
+				
+				
+			}else {
+				System.out.println("invalid create statement, check the manual of db_own");return;
+			}
+			
+			
+		}
 		
 	}
 }
