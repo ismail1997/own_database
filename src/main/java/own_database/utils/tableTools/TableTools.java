@@ -374,6 +374,7 @@ public class TableTools {
 					//TODO check if foreign table is exist or not and check if it has the column
 					
 					//check if the 
+					int i = 0;
 				}
 				
 				
