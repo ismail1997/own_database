@@ -10,5 +10,5 @@ public class Field {
 	private String fieldName;
 	private String fieldType;
 	private String primaryKey;
-	private String foreingKey;
+	private String foreignKey;
 }

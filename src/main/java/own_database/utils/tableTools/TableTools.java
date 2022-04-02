@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import own_database.models.Database;
+import own_database.models.Field;
 import own_database.models.Table;
 import own_database.utils.Constants;
 import own_database.utils.CryptoUtils;
@@ -160,7 +161,7 @@ public class TableTools {
 
 		}
 		table.setNumberOfColumns(mapOfFields.size());
-		table.setFields(mapOfFields);
+		//table.setFields(mapOfFields);
 		boolean addTableToDatabase =DatabaseTools.addTableDatabase(table.getDatabase(), table.getTableName());
 		if(!addTableToDatabase) {
 			return false;
@@ -215,12 +216,53 @@ public class TableTools {
 		tb.setTableName(tableName);
 		tb.setDatabase(databaseName);
 		tb.setNumberOfColumns(Integer.valueOf(numberOfColumns));
-		tb.setFields(mapOfFields);
+		//tb.setFields(mapOfFields);
 		
 		return tb;
 	}
 
 	public static void main(String[] args) throws Exception {
+		
+		String tbToString="Table(tableName=usex, database=users, numberOfColumns=4, listOfFields=[Field(fieldName=id, fieldType=int, primaryKey=pk, foreignKey=), Field(fieldName=sd, fieldType=string, primaryKey=, foreignKey=), Field(fieldName=isd, fieldType=int, primaryKey=, foreignKey=fg[sdf:id]), Field(fieldName=swatid, fieldType=int, primaryKey=, foreignKey=fg[sbouaddi:id])])";
+		tbToString = tbToString.substring(0,tbToString.length()-2);
+		System.out.println(tbToString);
+		String name = tbToString.substring(tbToString.indexOf("(tableName=")+"(tableName=".length(),tbToString.indexOf(", database="));
+		String db=tbToString.substring(tbToString.indexOf("database=")+"database=".length(),tbToString.indexOf(", numberOfColumns="));
+		String numberOfColumns = tbToString.substring(tbToString.indexOf("numberOfColumns=")+"numberOfColumns=".length(),tbToString.indexOf(", listOfFields="));
+		
+		Table table = new Table();
+		table.setDatabase(db);
+		table.setTableName(name);
+		table.setNumberOfColumns(Integer.parseInt(numberOfColumns));
+		List<Field> fields = new ArrayList<>();
+		//now getting the fields foreign 
+		String splitFields [] = tbToString.trim().split("listOfFields=\\[");
+		splitFields[1] = splitFields[1].trim();
+		String extractFields [] = splitFields[1].split("Field\\(");
+		for(String str : extractFields) {
+			if(str.equals("")) continue;
+			String fieldName = str.substring(str.indexOf("fieldName=")+"fieldName=".length(),str.indexOf(", fieldType")).trim();
+			String fieldType = str.substring(str.indexOf("fieldType=")+"fieldType=".length(),str.indexOf(", primaryKey")).trim();
+			String primaryKey = str.substring(str.indexOf("primaryKey=")+"primaryKey=".length(),str.indexOf(", foreignKey=")).trim();
+			String foreignKey = str.substring(str.indexOf("foreignKey=")+"foreignKey=".length(),str.indexOf(")")).trim();
+			
+			
+			Field fld = new Field();
+			fld.setFieldName(fieldName);
+			fld.setFieldType(fieldType);
+			fld.setPrimaryKey(primaryKey);
+			fld.setForeignKey(foreignKey);
+			fields.add(fld);
+			
+		}
+		
+		table.setListOfFields(fields);
+		System.out.println(table);
+	}
+	
+	
+	
+	public static void createtable() throws Exception {
 		String tbStatement ="   CREATE  table usex ( id int pk, sd string , isd int fg[sdf:id] , swatid int fg[sbouaddi:id]);   ";
 		
 		tbStatement = tbStatement.trim().replaceAll("\\s+", " ").toLowerCase();//trim all white spaces and replace it with single white space
@@ -232,6 +274,11 @@ public class TableTools {
 			System.out.println("invalid create table statement");
 			return;
 		}
+		
+		// Instantiate table
+		Table table = new Table();
+		List<Field> tableFields = new ArrayList<Field>();
+		
 		/*****
 		 * check the first split 
 		*/
@@ -271,6 +318,11 @@ public class TableTools {
 			System.out.println("invalid end of statement, missing ';' at the end");return;
 		}
 		
+		//assign variables to name
+		table.setDatabase("users");
+		table.setTableName(firstElementOfCreateTable[2]);
+
+		
 		String fields = splitToExtractTheFieldsAndEndStatement[0].trim();
 		String [] splitFields = fields.split(",");
 		
@@ -279,6 +331,7 @@ public class TableTools {
 		ArrayList<String> duplicatedForeignKeys = new ArrayList<String>();//to prevent duplicate of the same foreing key
 		
 		for(String str : splitFields) {
+			Field myField = new Field();
 			str=str.trim();
 			String splitFlds [] = str.split(" ");
 			
@@ -303,6 +356,10 @@ public class TableTools {
 				
 				createdFieldsAllReady.add(splitFlds[0]);//adding the column name to the created fields list
 				//TODO adding field to the table object 
+				myField.setFieldName(splitFlds[0].trim());
+				myField.setFieldType(splitFlds[1].trim());
+				myField.setPrimaryKey("");
+				myField.setForeignKey("");
 
 			}else if(splitFlds.length==3) { //example : id integer pk or | groupid int fg[table_name:key]
 				if(Constants.reservedWords().contains(splitFlds[0])) {//check if the column name is not a reserved word
@@ -337,6 +394,12 @@ public class TableTools {
 					}
 					
 					duplicatedPrimaryKeys.add(splitFlds[2]);//add the primary key to the list, to track duplication
+					
+					
+					myField.setFieldName(splitFlds[0].trim());
+					myField.setFieldType(splitFlds[1].trim());
+					myField.setPrimaryKey(splitFlds[2].trim());
+					myField.setForeignKey("");
 				
 				}else if(splitFlds[2].startsWith("fg")) {//check if the field is declared as foreign key
 				
@@ -373,8 +436,10 @@ public class TableTools {
 					
 					//TODO check if foreign table is exist or not and check if it has the column
 					
-					//check if the 
-					int i = 0;
+					myField.setFieldName(splitFlds[0].trim());
+					myField.setFieldType(splitFlds[1].trim());
+					myField.setPrimaryKey("");
+					myField.setForeignKey(splitFlds[2].trim());
 				}
 				
 				
@@ -384,7 +449,13 @@ public class TableTools {
 			}
 			
 			
+			tableFields.add(myField);
+			table.setListOfFields(tableFields);
+			table.setNumberOfColumns(tableFields.size());
+			
 		}
 		
+		writeTableToFile(table);
+		System.out.println(table);
 	}
 }

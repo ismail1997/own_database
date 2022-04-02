@@ -16,6 +16,6 @@ public class Table implements Serializable{
 	private String tableName ;
 	private String database ;
 	private int numberOfColumns =0;
-	private HashMap<String, String> fields ;
+	//private HashMap<String, String> fields ;
 	private List<Field> listOfFields;
 }
