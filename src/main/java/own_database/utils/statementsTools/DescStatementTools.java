@@ -63,14 +63,8 @@ public class DescStatementTools {
 		
 		return true;
 	}
-	public static boolean describeTable(String tableName,String databaseName) throws Exception {
+	public static void describeTable(String tableName,String databaseName) throws Exception {
 		Table table = TableTools.getTable(tableName, databaseName);
-		System.out.println(table);
-		return true;
-	}
-	public static void main(String[] args) throws Exception {
-		Table table = TableTools.getTable("userroles", "users");
-		System.out.println(table);
 		int sizeOfFieldName=0;
 		OptionalInt fs = table.getListOfFields().stream()
 	                .map(Field::getFieldName)
@@ -137,6 +131,10 @@ public class DescStatementTools {
 				   "-" + Tools.repeatedString('-', sizeOfFieldType) + "-+"+
 				   "-" + Tools.repeatedString('-', sizeOfKey) + "-+");
 		System.out.println(table.getListOfFields().size() + " rows in set");
+		
+		
+	}
+	public static void main(String[] args) throws Exception {
 	}
 
 }
