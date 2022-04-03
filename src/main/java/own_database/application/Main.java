@@ -47,7 +47,10 @@ public class Main {
 							ShowStatementTools.validShowStatement(statement);
 						}else if(keyWord.toLowerCase().equals("desc") || keyWord.toLowerCase().equals("describe")) {
 							DescStatementTools.validDescripeStatement(statement);
+						}else if(keyWord.toLowerCase().equals("insert")) {
+							DescStatementTools.validDescripeStatement(statement);
 						}
+						
 					}
 				}
 				
