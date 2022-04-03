@@ -83,11 +83,19 @@ public class DatabaseTools {
 	 * @throws Exception
 	 */
 	public static void showDatabases() throws Exception {
-		OptionalInt oi = getListOfDatabases().stream()
-                .map(Database::getDatabaseName)
-                .mapToInt(String::length)
-                .max();
-		int sizeOfStringFormat=oi.getAsInt();
+		int sizeOfStringFormat=0;
+		if(getListOfDatabases().size()==0) {
+			sizeOfStringFormat=0;
+		}else {
+			OptionalInt oi = getListOfDatabases().stream()
+	                .map(Database::getDatabaseName)
+	                .mapToInt(String::length)
+	                .max();
+			
+			sizeOfStringFormat=oi.getAsInt();
+		}
+		
+		
 		sizeOfStringFormat = sizeOfStringFormat < "Database".length() ? "Database".length() : sizeOfStringFormat;
 		String format = "| %-" + sizeOfStringFormat + "s |%n";
 		System.out.println("+-" + Tools.repeatedString('-', sizeOfStringFormat) + "-+");
@@ -162,7 +170,7 @@ public class DatabaseTools {
 		while (myReader.hasNextLine()) {
 			String data = myReader.nextLine();
 			Database database = splitData(CryptoUtils.decryptedData(data));
-			listOfDb.add(database);
+			if(database !=null )listOfDb.add(database);
 		}
 		return listOfDb;
 	}
@@ -189,10 +197,16 @@ public class DatabaseTools {
 		if(database == null) return ;
 		
 		List<String> listOfTables = database.getListOfTables();
-		OptionalInt oi = listOfTables.stream()
-                .mapToInt(String::length)
-                .max();
-		int sizeOfStringFormat=oi.getAsInt();
+		int sizeOfStringFormat=0;
+		if(listOfTables.size()==0) {
+			sizeOfStringFormat =0;
+		}else {
+			OptionalInt oi = listOfTables.stream()
+	                .mapToInt(String::length)
+	                .max();
+			sizeOfStringFormat=oi.getAsInt();
+		}
+		
 		sizeOfStringFormat = sizeOfStringFormat < dbName.length() ? dbName.length() : sizeOfStringFormat;
 		String format = "| %-" + sizeOfStringFormat + "s |%n";
 		System.out.println("+-" + Tools.repeatedString('-', sizeOfStringFormat) + "-+");
@@ -202,7 +216,7 @@ public class DatabaseTools {
 			System.out.format(format, string);
 		}
 		System.out.println("+-" + Tools.repeatedString('-', sizeOfStringFormat) + "-+");
-		System.out.println(getListOfDatabases().size() + " rows in set");
+		System.out.println(listOfTables.size() + " rows in set");
 	}
 	
 	/**
@@ -262,10 +276,12 @@ public class DatabaseTools {
 	
 	public static void main(String[] args) throws Exception {
 		 //showDatabases();
-		// dropDatabase("http");showDatabases();
-		//System.out.println(getDatabase("dfsd"));
-		//addTableDatabase("persons", "           ");
-		showTablesOfDatabase("alpha");
+		// dropDatabase("http");
+		//showDatabases();
+		//System.out.println(getDatabase("users"));
+		showTablesOfDatabase("users");
+		//addTableDatabase("users", "usex");
+		
 		
 		//getListOfDatabases().forEach(System.out::println);
 	//	Database database = new Database();
