@@ -19,83 +19,41 @@ import own_database.utils.Tools;
 import own_database.utils.databaseTools.DatabaseTools;
 
 public class TableTools {
+	/**
+	 * 
+	 * @param table
+	 */
 	public static void descriptTable(Table table) {
 
 	}
 
+	/**
+	 * 
+	 * @param table
+	 * @throws Exception
+	 */
 	public static void writeTableToFile(Table table) throws Exception {
 		Tools.writeToFile(CryptoUtils.encryptData(table.toString()), Constants.TABLES_FILES);
 	}
 
-	
+	/**
+	 * 
+	 * @param tableName
+	 * @param dbName
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean checkIfTableExistAlreadyInDb(String tableName,String dbName) throws Exception {
 		Table table = getTable(tableName,dbName);
 		if( table ==null) return false;
 		return true;
 	}
 	
-	public static Table getTable(String tableName) throws Exception {
-		for(Table t : getListOfTable()) {
-			if(t.getTableName().equals(tableName)) {
-				return t;
-			}
-		}
-		return null;
-	}
-	
-
-	
-
-	public static List<Table> getListOfTable() throws Exception {
-		List<Table> listOfTables = new ArrayList<>();
-
-		// get the file in which tables are stored
-		File myObj = new File(Constants.TABLES_FILES);
-		if (!myObj.exists())
-			return Collections.emptyList();
-
-		// define a scanner object to read from the file
-		Scanner myReader = new Scanner(myObj);
-
-		// read the data from file and pass it to the split method
-		// and finally store it to the list of the databases
-		while (myReader.hasNextLine()) {
-			String data = myReader.nextLine();
-			Table table = splitTableFromString(CryptoUtils.decryptedData(data));
-			listOfTables.add(table);
-		}
-
-		return listOfTables;
-	}
-
-	public static Table splitTableFromString(String data) {
-		String table = data;
-		table = table.substring(table.indexOf("Table(") + "Table(".length(), table.length() - 1);
-		String tableName = table.substring(table.indexOf("tableName=") + "tableName=".length(),
-				table.indexOf(", database="));
-		String databaseName = table.substring(table.indexOf("database=") + "database=".length(),
-				table.indexOf(", numberOfColumns="));
-		String numberOfColumns = table.substring(table.indexOf("numberOfColumns=") + "numberOfColumns=".length(),
-				table.indexOf(", fields="));
-		String fields = table.substring(table.indexOf("fields=") + "fields={".length(), table.length() - 1);
-
-		// create hash map and add the fields to it
-		String fieldArray[] = fields.split(",");
-		HashMap<String, String> mapOfFields = new HashMap<String, String>();
-		for (int i = 0; i < fieldArray.length; i++) {
-			String sp[] = fieldArray[i].split("=");
-			mapOfFields.put(sp[0].trim(), sp[1].trim());
-		}
-
-		Table tb = new Table();
-		tb.setTableName(tableName);
-		tb.setDatabase(databaseName);
-		tb.setNumberOfColumns(Integer.valueOf(numberOfColumns));
-		//tb.setFields(mapOfFields);
-		
-		return tb;
-	}
-	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public static List<Table> getTables() throws Exception{
 		List<Table> listOfTables = new ArrayList<>();
 
@@ -113,6 +71,13 @@ public class TableTools {
 		myReader.close();
 		return listOfTables;
 	}
+	
+	/**
+	 * 
+	 * @param database
+	 * @return
+	 * @throws Exception
+	 */
 	public static List<Table> getTablesByDB(String database) throws Exception{
 		List<Table> tables = new ArrayList<Table>();
 		for(Table tb : getTables()) {
@@ -123,6 +88,14 @@ public class TableTools {
 		if(tables == null) return null;
 		return tables;
 	}
+	
+	/**
+	 * 
+	 * @param table
+	 * @param database
+	 * @return
+	 * @throws Exception
+	 */
 	public static Table getTable(String table, String database) throws Exception {
 		for(Table tb : getTablesByDB(database)) {
 			if(tb.getTableName().equals(table) && tb.getDatabase().equals(database))
@@ -131,6 +104,11 @@ public class TableTools {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param tableToString
+	 * @return
+	 */
 	public static Table extractTableFromFile(String tableToString) {
 		String tbToString = tableToString;
 		tbToString = tbToString.substring(0,tbToString.length()-2);
@@ -169,6 +147,13 @@ public class TableTools {
 		return table;
 	}
 	
+	/**
+	 * 
+	 * @param tb
+	 * @param database
+	 * @return
+	 * @throws Exception
+	 */
 	public static List<Field> getFieldsOfTable(String tb, String database) throws Exception{
 		List<Field> fields = new ArrayList<Field>();
 		
@@ -179,6 +164,15 @@ public class TableTools {
 						
 		return fields;
 	}
+	
+	/**
+	 * 
+	 * @param fieldName
+	 * @param table
+	 * @param database
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean checkIfTableContainsField(String fieldName,String table,String database) throws Exception {
 		List<Field> listOfFields = getFieldsOfTable(table, database) ;
 		if(listOfFields == null) return false;
@@ -187,6 +181,15 @@ public class TableTools {
 		}
 		return false;
 	}
+	
+	/**
+	 * 
+	 * @param fieldName
+	 * @param tableName
+	 * @param databaseName
+	 * @return
+	 * @throws Exception
+	 */
 	public static String getTypeOfField(String fieldName,String tableName,String databaseName) throws Exception {
 		List<Field> fieldsOfTable = getFieldsOfTable(tableName, databaseName);
 		if(fieldsOfTable == null) return null;
@@ -203,7 +206,13 @@ public class TableTools {
 	
 	
 	
-	
+	/**
+	 * 
+	 * @param statement
+	 * @param currentDb
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean createTable(String statement,String currentDb) throws Exception {
 		String tbStatement =statement;
 		
@@ -422,18 +431,6 @@ public class TableTools {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		File myObj = new File(Constants.TABLES_FILES);	// get the file in which tables are stored
 		
-
-		Scanner myReader = new Scanner(myObj);// define a scanner object to read from the file
-
-		while (myReader.hasNextLine()) {// read the data from file and pass it to the split method
-			String data = myReader.nextLine();// and finally store it to the list of the databases
-			System.out.println(CryptoUtils.decryptedData(data));
-			
-		}
-		myReader.close();
-		
-		getTables().forEach(System.out::println);
 	}
 }
