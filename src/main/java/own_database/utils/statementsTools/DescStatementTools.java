@@ -1,5 +1,9 @@
 package own_database.utils.statementsTools;
 
+import java.util.OptionalInt;
+
+import own_database.models.Database;
+import own_database.models.Field;
 import own_database.models.Table;
 import own_database.utils.Constants;
 import own_database.utils.Tools;
@@ -51,20 +55,88 @@ public class DescStatementTools {
 		
 		boolean checkIfTableExistOrNot = TableTools.checkIfTableExistAlreadyInDb(array[1], currentDb);
 		if(!checkIfTableExistOrNot) {
-			System.out.format("error : '%s' table doesn't exist", array[1]);
+			System.out.format("error : '%s' table doesn't exist in '%s' database", array[1],currentDb);
 			return false;
 		}
 		
-		System.out.println("good descriping the table");
+		describeTable(array[1], currentDb);
 		
 		return true;
 	}
-	public static boolean descripeTable(String tableName) {
-		return false;
+	public static boolean describeTable(String tableName,String databaseName) throws Exception {
+		Table table = TableTools.getTable(tableName, databaseName);
+		System.out.println(table);
+		return true;
 	}
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		Table table = TableTools.getTable("userroles", "users");
+		System.out.println(table);
+		int sizeOfFieldName=0;
+		OptionalInt fs = table.getListOfFields().stream()
+	                .map(Field::getFieldName)
+	                .mapToInt(String::length)
+	                .max();
+		sizeOfFieldName=fs.getAsInt();
 		
-
+		
+		int sizeOfFieldType=0;
+		OptionalInt ftp = table.getListOfFields().stream()
+	                .map(Field::getFieldType)
+	                .mapToInt(String::length)
+	                .max();
+		sizeOfFieldType=ftp.getAsInt();
+		
+		int sizeOfFieldPrimaryKey=0;
+		OptionalInt fpk = table.getListOfFields().stream()
+	                .map(Field::getPrimaryKey)
+	                .mapToInt(String::length)
+	                .max();
+		sizeOfFieldPrimaryKey=fpk.getAsInt();
+		
+		int sizeOfFieldForeignKey=0;
+		OptionalInt ffg = table.getListOfFields().stream()
+	                .map(Field::getForeignKey)
+	                .mapToInt(String::length)
+	                .max();
+		sizeOfFieldForeignKey=ffg.getAsInt();
+		
+		int sizeOfKey = sizeOfFieldPrimaryKey <=sizeOfFieldForeignKey ? sizeOfFieldForeignKey :   sizeOfFieldPrimaryKey;
+		
+		sizeOfFieldName = sizeOfFieldName<"Field".length() ? "Field".length() : sizeOfFieldName;
+		sizeOfFieldType = sizeOfFieldType<"Type".length() ? "Type".length() : sizeOfFieldType;
+		sizeOfKey = sizeOfKey<"Key".length() ? "Key".length() : sizeOfKey;
+		
+		
+		
+		String format = "| %-" + sizeOfFieldName + "s | %-"+sizeOfFieldType+"s | %-"+sizeOfKey+"s |%n";
+		
+		System.out.println("+-" + Tools.repeatedString('-', sizeOfFieldName) + "-+"+
+						   "-" + Tools.repeatedString('-', sizeOfFieldType) + "-+"+
+						   "-" + Tools.repeatedString('-', sizeOfKey) + "-+");
+		
+		System.out.println("| Field" + Tools.repeatedString(' ', sizeOfFieldName - "Field".length()) + " |"
+						+" Type" + Tools.repeatedString(' ', sizeOfFieldType - "Type".length()) + " |"+
+						" Key" + Tools.repeatedString(' ', sizeOfKey - "Key".length()) + " |");
+		
+		System.out.println("+-" + Tools.repeatedString('-', sizeOfFieldName) + "-+"+
+				   "-" + Tools.repeatedString('-', sizeOfFieldType) + "-+"+
+				   "-" + Tools.repeatedString('-', sizeOfKey) + "-+");
+		
+		for (Field field : table.getListOfFields()) {
+			String key ="";
+			if(!field.getForeignKey().equals("") && !field.getForeignKey().equals(null)) {
+				key=field.getForeignKey();
+			}
+			if(!field.getPrimaryKey().equals("") && !field.getPrimaryKey().equals(null)) {
+				key=field.getPrimaryKey();
+			}
+			
+			System.out.format(format,field.getFieldName(),field.getFieldType(), key );
+		}
+		System.out.println("+-" + Tools.repeatedString('-', sizeOfFieldName) + "-+"+
+				   "-" + Tools.repeatedString('-', sizeOfFieldType) + "-+"+
+				   "-" + Tools.repeatedString('-', sizeOfKey) + "-+");
+		System.out.println(table.getListOfFields().size() + " rows in set");
 	}
 
 }
