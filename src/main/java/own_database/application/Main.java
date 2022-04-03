@@ -4,6 +4,7 @@ package own_database.application;
 import java.util.Scanner;
 
 import own_database.utils.statementsTools.CreateStatementTools;
+import own_database.utils.statementsTools.DescStatementTools;
 import own_database.utils.statementsTools.DropStatementTools;
 import own_database.utils.statementsTools.ShowStatementTools;
 import own_database.utils.statementsTools.StatementTools;
@@ -44,8 +45,8 @@ public class Main {
 							DropStatementTools.validDropStatement(statement);
 						}else if(keyWord.toLowerCase().equals("show")) {
 							ShowStatementTools.validShowStatement(statement);
-						}else if(keyWord.toLowerCase().equals("desc")) {
-							
+						}else if(keyWord.toLowerCase().equals("desc") || keyWord.toLowerCase().equals("describe")) {
+							DescStatementTools.validDescripeStatement(statement);
 						}
 					}
 				}

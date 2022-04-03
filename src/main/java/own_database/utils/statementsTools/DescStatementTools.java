@@ -19,41 +19,43 @@ public class DescStatementTools {
 			return false;
 		}
 		
-		//check if the first element of array is 'desc' or 'describe'
-		if(!array[0].toLowerCase().equals("desc") || !array[0].toLowerCase().equals("describe")) {
+		
+		if(!array[0].toLowerCase().equals("desc") && !array[0].toLowerCase().equals("describe")) {//check if the first element of array is 'desc' or 'describe'
 			System.out.println("invalid statement, check the manual of own_db");
 			return false;
 		}
-		//check if the last element of array is ';' 
-		if(!array[2].equals(";")) {
-			System.out.println("invalid end of desc statement, ");return false;
+		
+		if(!array[2].equals(";")) {//check if the last element of array is ';' 
+			System.out.println("invalid end of desc statement, missing ';' at the end");return false;
 		}
 		
-		//check if the second element is a  table name not a reserved word or start with a special character
-		if(Tools.checkIfStringContainsWithNumberOrChar(array[1])) {
-			System.out.println("invalid desc statement, check the manual of own_db");
+		
+		if(Tools.checkIfStringContainsWithNumberOrChar(array[1])) {//check if the table name is a valid name and doesn't contain any special characters or start with number
+			System.out.format("invalid table name '%s', check the manual of own_db%n",array[1]);
 			return false ;
 		}
 		
-		//check if the second element is not a reserved word
-		if(Constants.reservedWords().contains(array[1])) {
+		
+		if(Constants.reservedWords().contains(array[1])) {//check if the table name is not a reserved word
 			System.out.printf("syntax error: '%s' is a reserved word, cheack the manual of own_db\n",array[1]);
 			return false;
 		}
 		
-		//check if a database is selected 
-		String currentDb = UseStatementTools.getTheCurrentSessionDatabase();
+		
+		String currentDb = UseStatementTools.getTheCurrentSessionDatabase();//check if a database is selected 
 		if(currentDb.equals("") || currentDb.equals(null)) {
 			System.out.println("No database selected");
 			return false; 
 		}
 		
-		//check if table exist in database 
+		
 		boolean checkIfTableExistOrNot = TableTools.checkIfTableExistAlreadyInDb(array[1], currentDb);
 		if(!checkIfTableExistOrNot) {
 			System.out.format("error : '%s' table doesn't exist", array[1]);
 			return false;
 		}
+		
+		System.out.println("good descriping the table");
 		
 		return true;
 	}
