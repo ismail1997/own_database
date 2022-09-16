@@ -51,7 +51,6 @@ public class Main {
 							DescStatementTools.validDescripeStatement(statement);
 						}else if(keyWord.toLowerCase().equals("shcdb")) {
 							UseStatementTools.showCurrentDatabase ();
-							
 						}
 						
 					}

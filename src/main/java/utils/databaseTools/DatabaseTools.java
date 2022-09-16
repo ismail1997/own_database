@@ -17,6 +17,7 @@ import models.Table;
 import utils.Constants;
 import utils.CryptoUtils;
 import utils.Tools;
+import utils.statementsTools.UseStatementTools;
 
 public class DatabaseTools {
 
@@ -74,6 +75,11 @@ public class DatabaseTools {
 		}
 		
 		System.out.println("database removed successfully");
+		
+		if(db.toLowerCase().equals(UseStatementTools.getTheCurrentSessionDatabase())) {//if the dropped database is the current selected database, we should clear the session
+			UseStatementTools.clearCurrentSession();
+		}
+		
 	}
 
 

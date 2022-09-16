@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import utils.Constants;
+import utils.MessageConstants;
 import utils.databaseTools.DatabaseTools;
 
 public class DropStatementTools {
@@ -31,7 +32,7 @@ public class DropStatementTools {
 		}
 		
 		if(!checkIfDropIsNotFollowedWithUnvalidKeyWord(array[1])) {
-			System.out.println("Not cool again, not fucking cool again ");
+			System.out.println(MessageConstants.INVALID_DROP_STATEMENT);
 		}else {
 			if(StatementTools.checkIfUnvalidName(array[2]))
 			{
@@ -55,7 +56,7 @@ public class DropStatementTools {
 						return false;
 					}else {
 							DatabaseTools.dropDatabase(databaseName);
-						
+							
 					}
 					break;
 				}
