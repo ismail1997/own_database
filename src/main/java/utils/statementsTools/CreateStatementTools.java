@@ -50,7 +50,7 @@ public class CreateStatementTools {
 					break;
 				}
 				case "database" :{
-					String dbName = array[2];
+					String dbName = array[2].toLowerCase();
 					//check if the name is already exist or not 
 					if(DatabaseTools.checkIfDatabaseNameExist(dbName)) {
 						System.out.format("Can't create database '%s'; database exists",array[2]);
