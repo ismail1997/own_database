@@ -22,9 +22,8 @@ public class CreateStatementTools {
 		
 
 		
-		if(!checkIfCreateIsNotFollowedWithUnvalidKeyWord(array[1])) {
+		if(!checkIfCreateIsNotFollowedWithUnvalidKeyWord(array[1].toLowerCase())) {
 			System.out.println(MessageConstants.INVALID_KEYWORD_MESSAGE+" '"+array[1]+"'");
-			//System.out.println("not cool , not fucking cool , you do not know how not cool that shit is");
 		}else {
 			
 			if(StatementTools.checkIfUnvalidName(array[2]))
@@ -37,7 +36,7 @@ public class CreateStatementTools {
 				System.out.format("You have an error in your SQL syntax; %s is a reserved word",array[2]);
 				return false;
 			}
-			switch(array[1]) {
+			switch(array[1].toLowerCase()) {
 				case "table" :{
 					String tableName = array[2];
 					//first check if the user selected the database
