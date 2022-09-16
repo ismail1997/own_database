@@ -25,7 +25,7 @@ public class InsertStatementTools {
 		String insertSex = "insert into jee (id,name) values ( 4,'ismail') , (6,'jee');";
 
 		String insertSev  = "insert into jee (id,name,email) values (4,'ismail','email');";
-		String insertHei = "insert into user               (id,email,price) values      (4      ,    'ismail','google'),(3,'ismail','swat');";
+		String insertHei = "insert into users               (id,email,price) values      (4      ,    'ismail','google'),(3,'ismail','swat');";
 
 
 		/**
@@ -59,7 +59,7 @@ public class InsertStatementTools {
 		 * we start with the first string:
 		 *    verify the keywords and the table name
 		 *    but first we should get the type of the insert
-		 *    for example : insert into table_name is not like insert into table_name (col1,col3)
+		 *    for example : 'insert into table_name' is not like 'insert into table_name (col1,col3)'
 		 *    so we should split the first string and get the type of it
 		 */
 
@@ -80,6 +80,8 @@ public class InsertStatementTools {
 
 		/**
 		 * now with the keyword insert string: we verify the keywords
+		 * here the first part of  insert statement are the same for both types 'insert into table_name'
+		 * now we should handle that string, we verify 'insert' , 'into' and 'table_name'
 		 */
 		String keywords [] = keywordInsertString.split(" ");
 
@@ -93,19 +95,22 @@ public class InsertStatementTools {
 			System.out.println("invalid insert statement, please check the manual");return;
 		}
 		if(Constants.reservedWords().contains(keywords[2])){//check if the table name is not a reserved word
-			System.out.format("invalid insert statement, %s is a reserved word%n",keywords[2]);
+			System.out.format("invalid insert statement, '%s' is a reserved word%n",keywords[2]);return;
 		}
 
 		/**
-		 * check if the table exist in the database and check if the table has those fields
+		 * check if the table exist in the current database and check if the table has those fields
 		 */
-
-		Table table = TableTools.getTable(keywords[2],"users");
+		
+		String currentDatabase =UseStatementTools.getTheCurrentSessionDatabase(); //get the current selected database
+		currentDatabase="alpha";
+		
+		Table table = TableTools.getTable(keywords[2],currentDatabase);//check if the table exists in the database
 		if(table == null){
-			System.out.format("you have syntax error, table '%s' doesn't exist%n");return;
+			System.out.format("ERROR : Table '%s' doesn't exist%n",keywords[2]);return;
 		}
 
-		List<Field> fields = table.getListOfFields();
+		List<Field> fields = table.getListOfFields();//getting the fields of the table 
 		System.out.println(fields);
 
 

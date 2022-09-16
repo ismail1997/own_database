@@ -14,6 +14,7 @@ import java.util.Scanner;
 import models.Database;
 import utils.Constants;
 import utils.CryptoUtils;
+import utils.MessageConstants;
 import utils.databaseTools.DatabaseTools;
 
 public class UseStatementTools {
@@ -41,7 +42,20 @@ public class UseStatementTools {
 		return CryptoUtils.decryptedData(read);
 	}
 	
-	public static boolean showCurrentDatabase () throws Exception{
+	public static boolean showCurrentDatabase (String statement) throws Exception{
+		
+		String [] array = statement.split(" ");
+		
+		if(array.length == 2) {
+			if(!array[1].equals(";")) {
+				System.out.println("invalid end of statement, missing ';' at the end.");
+				return false;
+			}
+		}else if(array.length>2) {
+			System.out.println("invalid show current database statement, check the manual of "+MessageConstants.DATABASE_MOTOR_NAME);
+			return false;
+		}
+		
 		String showDatabase = getTheCurrentSessionDatabase();
 		if(showDatabase.equals("") || showDatabase.equals(null)) {
 			System.out.println("No database selected");

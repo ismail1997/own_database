@@ -50,7 +50,7 @@ public class Main {
 						}else if(keyWord.toLowerCase().equals("insert")) {
 							DescStatementTools.validDescripeStatement(statement);
 						}else if(keyWord.toLowerCase().equals("shcdb")) {
-							UseStatementTools.showCurrentDatabase ();
+							UseStatementTools.showCurrentDatabase (statement);
 						}
 						
 					}

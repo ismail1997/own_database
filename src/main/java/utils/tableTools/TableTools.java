@@ -338,7 +338,7 @@ public class TableTools {
 					System.out.format("error : only 'int' type are allowed to be primary or foreing keys not '%s'; check the manual of db_own%n",splitFlds[1]);return false;
 				}
 				if(!splitFlds[2].startsWith("pk") && !splitFlds[2].startsWith("fg")) {//pk indicates the primary key, and fg indicates foreing_key
-					System.out.format("invalid references '%s', please check the manual of own_db",splitFlds[2]);return false;
+					System.out.format("invalid references '%s', please check the manual of own_db \n",splitFlds[2]);return false;
 				}
 			
 				if(splitFlds[2].startsWith("pk")) {//if the field is declared as primary key
