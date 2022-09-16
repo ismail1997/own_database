@@ -5,6 +5,7 @@ import java.util.List;
 
 import models.Database;
 import utils.Constants;
+import utils.MessageConstants;
 import utils.databaseTools.DatabaseTools;
 import utils.tableTools.TableTools;
 
@@ -22,7 +23,8 @@ public class CreateStatementTools {
 
 		
 		if(!checkIfCreateIsNotFollowedWithUnvalidKeyWord(array[1])) {
-			System.out.println("not cool , not fucking cool , you do not know how not cool that shit is");
+			System.out.println(MessageConstants.INVALID_KEYWORD_MESSAGE+" '"+array[1]+"'");
+			//System.out.println("not cool , not fucking cool , you do not know how not cool that shit is");
 		}else {
 			
 			if(StatementTools.checkIfUnvalidName(array[2]))
