@@ -40,7 +40,17 @@ public class UseStatementTools {
 
 		return CryptoUtils.decryptedData(read);
 	}
-
+	
+	public static boolean showCurrentDatabase () throws Exception{
+		String showDatabase = getTheCurrentSessionDatabase();
+		if(showDatabase.equals("") || showDatabase.equals(null)) {
+			System.out.println("No database selected");
+		}else {
+			System.out.println("The current database is : '"+showDatabase+"'");
+		}
+		return true;
+	}
+	
 	public static boolean validUseStatememt(String statement) throws Exception {
 		if (statement.equals(null) || statement.equals(""))
 			return false;
