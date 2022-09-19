@@ -8,8 +8,10 @@ import utils.tableTools.TableTools;
 
 import javax.tools.Tool;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class InsertStatementTools {
 
@@ -22,18 +24,20 @@ public class InsertStatementTools {
 		String insertFour = "insert into jee (id) values (4) ;";
 
 		String insertFive = "insert into jee (id,name ) values (3,'ismail');";
-		String insertSex = "insert into jee (id,name) values ( 4,'ismail') , (6,'jee');";
+		String insertSex = "insert into jee (id,name) values ( 4,'ismail') | (6,'jee');";
 
 		String insertSev  = "insert into jee (id,name,email) values (4,'ismail','email');";
-		String insertHei = "insert into users               (id,email,price) values      (4      ,    'ismail','google'),(3,'ismail','swat');";
+		String insertHei = "insert into users               (id,email,price) values      (4      ,    'ismail@gmail.com',23.45)|(3,'hitman@gmail.com',56);";
 
+		String insertTest = "insert into users               (email,id,price) values      ('ismail@gmail.com',2,23.45)|('hitman@gmail.com',34,56);";
+		String insertTestTwo = "insert into users               (price,email,id) values      (23.45,'sd',3)|(45.34,'google',53);";
 
 		/**
 		 * first we split the string into two strings : one is 'insert into table_name (columns)'
 		 * 											    second is 'values (value1,value3)
 		 */
 
-		String chosenString = insertHei.trim().replaceAll("\\s+"," ");
+		String chosenString = insertTest.trim().replaceAll("\\s+"," ");
 
 
 		String splitWithValueKeyword [] = chosenString.split("values");
@@ -112,138 +116,179 @@ public class InsertStatementTools {
 
 		List<Field> fields = table.getListOfFields();//getting the fields of the table 
 		System.out.println(fields);
+		
+		/***
+		 * now we move to the second part of the insert statement which is fields declarations and values 
+		 * here as we said before there are two types :
+		 * 			2 : insert into table_name (id,name) 
+		 * 			1 : insert into table_name
+		 * we should verify for the 2 type 
+		 */
+		
+		////// starting with the second type 
+		System.out.println(columnDeclarationString); //the fields are represented like this : id,email,price
+		String columns [] = columnDeclarationString.split(",");
+		
+		if(columns.length>fields.size()) {//the fields declared in the statement are more than the fields in the table
+			System.out.println("ERROR : The fields declared in the statement are more than the fields int the table");return;
+		}
+		if(columns.length == fields.size()) {
+			//in this case the numbers of fields are the same in the table and statement declaration
+			//for example table fields [id,name, price] and the statement is 'insert into tableName (id,name,price)
+			//now we should verify if the fields are the same in the statement
+			
+			ArrayList<String> fieldsAsString = new ArrayList<String>();
+			for(Field fi : fields) {fieldsAsString.add(fi.getFieldName());}//convert fields to string list to compare it with statement
+			System.out.println(fieldsAsString);
+			
+			for(String col : columns) {//verify if the columns are the same
+				if(!fieldsAsString.contains(col)) {
+					System.out.println("ERROR : '"+col+"' field doesn't exist in the "+table.getTableName()+" table.");
+					return;
+				}
+			}
+			
+			
+			
+			
+			//now we should check the second part, the values part : 'values (1,'ISMAIL','ISMAIL@GMAIL.COM' ),(...)
+			System.out.println();
+			//System.out.println(secondPartString);
+			//we should verify the cardinal of values is the same as cardinal of column declaration
+			// for example if the columns are (id,email,price) the values should be (1,"h","h") not (1,"y","y","y")
+			//for that we should split the value part into multiple parts 
+			String [] stringValueParts = secondPartString.split("\\|");
+			//for(String str : stringValueParts) System.out.println(str);
+			
+			int i = 1;
+			for(String string : stringValueParts) {
+				String cardinalValues [] = string.split(",");
+				if(columns.length != cardinalValues.length) {//in this part we verify the count of column and value
+					System.out.println("ERROR : Column count doesn't match value count at row "+i);
+					return ;
+				}
+				i++;
+ 			}
+			
+			//now we should get all values into one list of list to iterate over it 
+			//  [ [value1],[value2],...]
+			ArrayList<String> vals = new ArrayList<String>();
+			for(String string : stringValueParts) {
+				String verifiedStr = string.replace("(", "");
+					   verifiedStr = verifiedStr.replace(")", "");
+					   verifiedStr = verifiedStr.replace(";", "");
+					   verifiedStr = verifiedStr.replace(",", "<>");
+				vals.add(verifiedStr);
+			}
+			
+			
+			//System.out.println(vals);
+			ArrayList<ArrayList<String>> listOfValues = new ArrayList<ArrayList<String>>();
+			ArrayList<String> valeurs = new ArrayList<String>();
+			
+			for(String s : vals) {
+				String splitedStr [] = s.split("<>");
+				for(int k = 0 ; k<splitedStr.length;k++) {
+					//System.out.println(splitedStr[k]+"   type of field is  "+
+							//TableTools.getTypeOfField(fieldsAsString.get(k), table.getTableName(), table.getDatabase()));
+					
+					String fld =splitedStr[k].trim();
+					
+					
+					String typeOfField = TableTools.getTypeOfField(columns[k], table.getTableName(), table.getDatabase());
+					
+					switch(typeOfField) {
+						case "int":{
+							if(Tools.isNumeric(fld.trim())) {//check if the field is numeric ( integer or double ) 
+								if(fld.contains(".")) {
+									System.out.println("ERROR : Invalid type, expected integer but given double");return;
+								}else {//check now if the field is a primary key or not and if the auto incremented is activated
+									System.out.println(fld+" : is integer");
+									valeurs.add(columns[k]+":"+fld);
+									break;
+								}
+							}else {//if the field is not numeric then throw an error 
+								System.out.println("ERROR : Invalid type, expected integer but given other type");return ;
+							}
+						}
+						case "double":{
+							if(Tools.isNumeric(fld.trim())) {//check if the field is numeric ( integer or double ) 
+								System.out.println(fld+" : is double");
+								valeurs.add(columns[k]+":"+fld);
+								break;
+							}else {
+								System.out.println("ERROR : Invalid type, expected doube but given other type");return ;
+							}
+						}
+						case "char":{//TODO  add char handling 
+							break;
+						}
+						case "date":{//TODO add date handling 
+							break;
+						}
+						case "boolean":{//TODO add boolean handling 
+							break;
+						}
+						default:{//the default type is String
+							if(fld.startsWith("'") && fld.endsWith("'")) {
+								System.out.println(fld+ " : is string");
+								valeurs.add(columns[k]+":"+fld);
+								break;
+							}else if(fld.startsWith("\"") && fld.endsWith("\"")) {
+								System.out.println(fld+ " : is string");
+								valeurs.add(columns[k]+":"+fld);
+								break;
+							}else {
+								System.out.println("ERROR : You have an error in your SQL syntax near "+fld);return ;
+							}
+							
+						}
+					}
+				}
+				
+				listOfValues.add(valeurs);
+				valeurs=new ArrayList<>();
+			}
+			
+			
+			//System.out.println(listOfValues);
+			System.out.println("_______________________");
+			for(int z = 0 ; z< listOfValues.size();z++) {
+				
+				Map<Integer,String> map = new HashMap<Integer,String>();
+				
+				for(int x = 0 ; x< listOfValues.get(z).size(); x++) {
+					String myField = listOfValues.get(z).get(x);
+					String fieldName = myField.substring(0,myField.indexOf(":"));
+					String fieldValue= myField.substring(myField.indexOf(":")+1,myField.length());
+					int indexOfFieldInTableFields = fieldsAsString.indexOf(fieldName);
+					//System.out.println(indexOfFieldInTableFields+" value :"+fieldValue);
+					map.put(indexOfFieldInTableFields,fieldValue);
+				}
+				map=Tools.sortByKeys(map);
+				System.out.println("-----------");
+				String dataToBeSaved="";
+				 for (Integer key: map.keySet()){
+			            //System.out.println(key +" = "+map.get(key));
+					 dataToBeSaved+=map.get(key)+"\t\t";
+			     }
+				 TableTools.createTableData(table,dataToBeSaved);
+			}
+			System.out.println("Query OK, "+listOfValues.size()+" row affected");return;
+			
+			
+			
+		}
+		
 
 
 
 	}
 	
-	public static void jpe(String[] args) throws Exception {
-		Table table = TableTools.getTable("user","users");
-		List<Field> fields = table.getListOfFields();
-		System.out.println(fields);
-
-		if(fields != null) return ;
-
-		String insert ="insert into user  values (2,'ismail','ismail') , (3,'shl','ismail'),(4,'shl','ismail');";
-		insert = insert.trim().replaceAll("\\s+", " ");
-
-		String [] splitInsert = insert.split("values");
-		if(splitInsert.length !=2){
-			System.out.println("invalid insert statement, check the manual of the db_own");
-			return;
-		}
-
-		String firstSplit = splitInsert[0].trim();
-		String secondSplit = splitInsert[1].trim();
-
-		/**
-		 * the first insert has three possibilities
-		 *     1 with no arguments like this insert into user values (3,"ismail"),(3,"ahmed");
-		 *     2 with less arguments like this insert into user (id ) values (3),(4);
-		 *     3 with full arguments like this insert into user (id , email ) values (3,"ismail"),(4,"mohamed");
-		 */
-
-		String firstSplitInsert[] = firstSplit.split("\\(");
-		System.out.println(firstSplitInsert.length);
-
-		ArrayList<String> fieldsAdded = new ArrayList<>();
-		if(firstSplitInsert.length == 1){
-			int sizeOfTableFields = table.getListOfFields().size(); //get the number of fields that table contains
-			secondSplit = secondSplit.replaceAll("\\s","");//remove the white space
-			char lastCharacter = secondSplit.charAt(secondSplit.length()-1);
-			if(lastCharacter!=';'){
-				System.out.println("invalid end of statement, missing ';' at the last ");return;
-			}
-			//if the last character is ';' then we should remove it from the string
-			secondSplit=secondSplit.substring(1,secondSplit.length()-2);//we are removing also the parentheses from the beginning and the last
-			System.out.println(secondSplit);
-			String [] getValues = secondSplit.split("\\),\\(");
-			for (String str : getValues) {
-				String[] getContentFromValues = str.split(",");
-				if(getContentFromValues.length != sizeOfTableFields){//check if the number of given values match the number of columns exist in table
-					System.out.println("Column count doesn't match value count at row");return;
-				}
-				for(String value : getContentFromValues){
-
-				}
-			}
-
-			return;
-		}else if(firstSplitInsert.length == 2){
-			/**
-			 * handle the first keyword 'insert into table_name'
-			 */
-			String keywordsSplit [] = firstSplitInsert[0].split(" ");
-			if(keywordsSplit.length != 3){//check if the first of element contains three keywords 'insert' 'into' 'table_name'
-				System.out.println("invalid insert statement, check the manual of own_db");return;
-			}
-
-			if(!keywordsSplit[0].trim().equalsIgnoreCase("insert")){//check if the statement is started with 'insert'
-				System.out.println("error insert statement should start with 'insert' key word");return;
-			}
-			if(!keywordsSplit[1].trim().equalsIgnoreCase("into")){//check if the into keyword is in the right place
-				System.out.println("error: invalid insert statement, check the manual of own_db");return;
-			}
-			if(Constants.reservedWords().contains(keywordsSplit[2])){//check if table name is not a reserved word
-				System.out.printf("invalid table name, '%s' is a reserved word \n",keywordsSplit[2]);return;
-			}
-			if(Tools.checkIfStringContainsWithNumberOrChar(keywordsSplit[2])){//check if the table name doesn't contain any special characters and starts with number
-				System.out.printf("invalid table name, '%s' should not contain any special characters or start with number\n",keywordsSplit[2]);return;
-			}
-
-			/**
-			 * handle the second statement '(id,email,..)
-			 */
-			firstSplitInsert[1]=firstSplitInsert[1].trim().substring(0,firstSplitInsert[1].length()-1);
-
-			String fieldSplits [] = firstSplitInsert[1].split(",");
-			int numberOfFieldsToAssign = fieldSplits.length;
-
-
-			for (int i = 0 ; i < fieldSplits.length ; i++){
-				if(Constants.reservedWords().contains(fieldSplits[i])){
-					System.out.format("invalid field name, '%s' is a reserved type\n",fieldSplits[i]);return;
-				}
-				if(Tools.checkIfStringContainsWithNumberOrChar(fieldSplits[i])){
-					System.out.format("invalid field name, '%s' is not a compatible name \n",fieldSplits[i]);return;
-				}
-				if(fieldsAdded.contains(fieldSplits[i])){
-					System.out.printf("field '%s' already added to statement\n",fieldSplits[i]);return;
-				}
-
-				fieldsAdded.add(fieldSplits[i]);
-			}
-
-			for(String str : fieldsAdded)//check if the table contains those declared fields
-				if(!TableTools.checkIfTableContainsField(str,table.getTableName(),table.getDatabase())){
-					System.out.printf("table '%s' doesn't have field named '%s'\n",table.getTableName(),str);
-					return;
-				}
-		}
-
-		System.out.println("_________________________________");
-
-		//System.out.println(secondSplit);
-		secondSplit="(2,'ismail'),(3,'shl'),(4,'shl');";
-		secondSplit = secondSplit.replaceAll("\\s","");//remove the white space
-		char theLastCharacterOfInsertStatement=secondSplit.charAt(secondSplit.length()-1);
-		if(theLastCharacterOfInsertStatement!=';'){
-			System.out.println("invalid end of insert statement, missing ';' at the end");return;
-		}
-		secondSplit=secondSplit.substring(0,secondSplit.length()-1);//remove ';' from the last of string
-
-		System.out.println(secondSplit);
-
-		String vals [] = secondSplit.split("\\),");
-		for(String str : vals) {
-			System.out.println(str.replaceAll("[()]",""));
-		}
-
-
-
-
-
-
-		}
+	public static void saveInsertToFile(Table table,ArrayList<ArrayList<String>> values) {
+		
+	}
+	
+	
 	}
 

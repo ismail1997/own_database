@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -56,7 +59,39 @@ public class Tools {
 		return false ;
 	}
 	
-	public static void main(String[] args) {
+	
+	private static Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
+	public static boolean isNumeric(String strNum) {
+	    if (strNum == null) {
+	        return false; 
+	    }
+	    return pattern.matcher(strNum).matches();
+	}
+	
+	public static <K extends Comparable, V> Map<K, V> sortByKeys(Map<K, V> map)
+    {
+        // create a list of map keys and sort it
+        List<K> keys = new ArrayList(map.keySet());
+        Collections.sort(keys);
+ 
+        // create an empty insertion-ordered `LinkedHashMap`
+        Map<K, V> linkedHashMap = new LinkedHashMap<>();
+ 
+        // for every key in the sorted list, insert key-value
+        // pair in `LinkedHashMap`
+        for (K key: keys) {
+            linkedHashMap.put(key, map.get(key));
+        }
+ 
+        return linkedHashMap;
+    }
+	public static void main(String[] args) {
+		HashMap<Integer,String> myMap = new HashMap<>();
+		myMap.put(34, "ismail");
+		myMap.put(1, "je");
+		myMap.put(23,"http");
+		
+		System.out.println(sortByKeys(myMap));
 	}
 }

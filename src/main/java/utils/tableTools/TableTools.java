@@ -430,7 +430,24 @@ public class TableTools {
 		return true;
 	}
 	
-	public static void main(String[] args) throws Exception {
+	
+	public static boolean createTableDataHeader(Table table) throws Exception{
+		String fields = "";
+		for(Field field :table.getListOfFields()) {
+			fields+=field.getFieldName()+"\t\t";
+		}
 		
+		System.out.println(fields);
+		
+		Tools.writeToFile(fields, table.getTableName()+"_"+table.getDatabase()+".owndb");
+		return true;
+	}
+	public static boolean createTableData(Table table,String value) throws Exception{
+		Tools.writeToFile(value, table.getTableName()+"_"+table.getDatabase()+".owndb");
+		return true;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		createTableData(getTable("users", "alpha"),"2		ismailbouaddi		2");
 	}
 }
