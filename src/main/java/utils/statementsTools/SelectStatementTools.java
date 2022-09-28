@@ -21,11 +21,20 @@ public class SelectStatementTools {
 	    if(!end.equals(";")) {
 	    	System.out.println("ERROR : invalid end of statement, missing ';' ");return;
 	    }
+	    
+	    
+	   
 			   
 	    //first we should check if the string contains form 
 	    //for that we should divide the string 
 	    ArrayList<String> dividedSelect = new ArrayList<>();
 	    dividedSelect.addAll(Arrays.asList(chosenSelect.split(" ")));
+	    
+	    
+	    //check if there is another ; in the statement
+	    if(Tools.countFrequencies(dividedSelect, ";")>1) {
+	    	System.out.println("ERROR : invalid select statement, please check the manual");return;
+	    }
 	    
 	    boolean containsWhereClause=false;
 	    boolean containsWhereClauseAndAlso = false;

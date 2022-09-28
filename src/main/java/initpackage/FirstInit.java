@@ -1,6 +1,9 @@
 package initpackage;
 
 import java.io.File;
+import java.util.ArrayList;
+
+import utils.Tools;
 
 public class FirstInit {
 	
@@ -18,6 +21,8 @@ public class FirstInit {
 	}
 
 	public static void main(String[] args) {
-		createDatabaseFolder();
+		ArrayList<String> myarray = new ArrayList<String>();
+		myarray.add(";");myarray.add(";");
+		System.out.println(Tools.countFrequencies(myarray, ";"));
 	}
 }
