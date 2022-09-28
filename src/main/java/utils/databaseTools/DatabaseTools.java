@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Scanner;
 
+import initpackage.FirstInit;
 import models.Database;
 import models.Table;
 import utils.Constants;
@@ -64,7 +65,7 @@ public class DatabaseTools {
 		}
 
 		// clear the file
-		BufferedWriter clearBuffer = new BufferedWriter(new FileWriter(new File(Constants.DATABASE_FILE)));
+		BufferedWriter clearBuffer = new BufferedWriter(new FileWriter(new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.DATABASE_FILE)));
 		clearBuffer.write("");
 		clearBuffer.close();
 
@@ -124,7 +125,7 @@ public class DatabaseTools {
 		String encodedDataBaseName = CryptoUtils.encryptData(formatOfSavingDatabase);
 		if (encodedDataBaseName.equals(null) || encodedDataBaseName.equals(""))
 			return false;
-		Tools.writeToFile(encodedDataBaseName, Constants.DATABASE_FILE);
+		Tools.writeToFile(encodedDataBaseName,FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.DATABASE_FILE);
 		return true;
 	}
 	
@@ -163,7 +164,7 @@ public class DatabaseTools {
 	public static List<Database> getListOfDatabases() throws Exception {
 		
 		//get the file in which databases are stored
-		File myObj = new File(Constants.DATABASE_FILE);
+		File myObj = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.DATABASE_FILE);
 		if (!myObj.exists())
 			return Collections.emptyList();
 		
@@ -266,7 +267,7 @@ public class DatabaseTools {
 			}
 		}
 		//clear the database file 
-		BufferedWriter clearBuffer = new BufferedWriter(new FileWriter(new File(Constants.DATABASE_FILE)));
+		BufferedWriter clearBuffer = new BufferedWriter(new FileWriter(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ new File(Constants.DATABASE_FILE)));
 		clearBuffer.write("");
 		clearBuffer.close();
 		

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import initpackage.FirstInit;
 import models.Database;
 import models.Field;
 import models.Table;
@@ -35,7 +36,7 @@ public class TableTools {
 	 * @throws Exception
 	 */
 	public static void writeTableToFile(Table table) throws Exception {
-		Tools.writeToFile(CryptoUtils.encryptData(table.toString()), Constants.TABLES_FILES);
+		Tools.writeToFile(CryptoUtils.encryptData(table.toString()), FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.TABLES_FILES);
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class TableTools {
 	public static List<Table> getTables() throws Exception {
 		List<Table> listOfTables = new ArrayList<>();
 
-		File myObj = new File(Constants.TABLES_FILES); // get the file in which tables are stored
+		File myObj = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.TABLES_FILES); // get the file in which tables are stored
 		if (!myObj.exists())
 			return Collections.emptyList();
 
@@ -499,19 +500,19 @@ public class TableTools {
 			fields += field.getFieldName() + "\t\t";
 		}
 
-		Tools.writeToFile(CryptoUtils.encryptData(fields), table.getTableName() + "_" + table.getDatabase() + ".owndb");
+		Tools.writeToFile(CryptoUtils.encryptData(fields),FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+  table.getTableName() + "_" + table.getDatabase() + ".owndb");
 		return true;
 	}
 
 	public static boolean createTableData(Table table, String value) throws Exception {
-		Tools.writeToFile(CryptoUtils.encryptData(value), table.getTableName() + "_" + table.getDatabase() + ".owndb");
+		Tools.writeToFile(CryptoUtils.encryptData(value),FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+  table.getTableName() + "_" + table.getDatabase() + ".owndb");
 		return true;
 	}
 
 	public static void readDataFromTableAsterixWithoutWhereClause(String tableName, String databaseName)
 			throws Exception {
 		// get the file in which databases are stored
-		File myObj = new File(tableName + "_" + databaseName + ".owndb");
+		File myObj = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ tableName + "_" + databaseName + ".owndb");
 		if (!myObj.exists()) {
 			System.out.println("table doesn't exist");
 			return;// Collections.emptyList();
@@ -597,7 +598,7 @@ public class TableTools {
 		}
 
 		// get the file in which databases are stored
-		File myObj = new File(tableName + "_" + databaseName + ".owndb");
+		File myObj = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ tableName + "_" + databaseName + ".owndb");
 		if (!myObj.exists()) {
 			System.out.println("table doesn't exist");
 			return;// Collections.emptyList();
