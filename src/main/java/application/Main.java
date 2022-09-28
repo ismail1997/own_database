@@ -6,6 +6,8 @@ import java.util.Scanner;
 import utils.statementsTools.CreateStatementTools;
 import utils.statementsTools.DescStatementTools;
 import utils.statementsTools.DropStatementTools;
+import utils.statementsTools.InsertStatementTools;
+import utils.statementsTools.SelectStatementTools;
 import utils.statementsTools.ShowStatementTools;
 import utils.statementsTools.StatementTools;
 import utils.statementsTools.UseStatementTools;
@@ -48,7 +50,9 @@ public class Main {
 						}else if(keyWord.toLowerCase().equals("desc") || keyWord.toLowerCase().equals("describe")) {
 							DescStatementTools.validDescripeStatement(statement);
 						}else if(keyWord.toLowerCase().equals("insert")) {
-							DescStatementTools.validDescripeStatement(statement);
+							InsertStatementTools.validInsertStatement(statement);
+						}else if(keyWord.toLowerCase().equals("select")) {
+							SelectStatementTools.validSelectStatement(statement);
 						}else if(keyWord.toLowerCase().equals("shcdb")) {
 							UseStatementTools.showCurrentDatabase (statement);
 						}

@@ -86,12 +86,36 @@ public class Tools {
  
         return linkedHashMap;
     }
+	
+	
+	public static int  countFrequencies(ArrayList<String> list,String element)
+    {
+        // hashmap to store the frequency of element
+        Map<String, Integer> hm = new HashMap<String, Integer>();
+        //integer to store the frequency of element;
+        int frq = 0 ;
+ 
+        for (String i : list) {
+            Integer j = hm.get(i);
+            hm.put(i, (j == null) ? 1 : j + 1);
+        }
+ 
+        // displaying the occurrence of elements in the arraylist
+        if(!list.contains(element)) return 0;
+        frq = hm.get(element);
+        return frq;
+    }
+    public static <K, V> K getKeyOfValueFromMap(Map<K, V> map, V value)
+    {
+        return map.entrySet().stream()
+                .filter(entry -> value.equals(entry.getValue()))
+                .findFirst().map(Map.Entry::getKey)
+                .orElse(null);
+    }
+ 
+	
 	public static void main(String[] args) {
-		HashMap<Integer,String> myMap = new HashMap<>();
-		myMap.put(34, "ismail");
-		myMap.put(1, "je");
-		myMap.put(23,"http");
-		
-		System.out.println(sortByKeys(myMap));
+		ArrayList<String> list= new ArrayList<String> (); list.addAll(Arrays.asList("select","select","select","*","*"));
+		System.out.println(countFrequencies(list, "select"));
 	}
 }

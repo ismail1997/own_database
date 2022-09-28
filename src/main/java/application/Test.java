@@ -15,22 +15,20 @@ public class Test {
 
 	public static void main(String[] args) throws Exception {
 		
-		/*
-		 * String db="jee";
-		 * 
-		 * 
-		 * String al
-		 * ="             create                database         jee        ;       ";
-		 * al = al.replaceAll("\\s+"," ").trim(); System.out.println(al.trim()); String
-		 * [] myArray=al.split(" ");
-		 * 
-		 * System.out.println(myArray.length);
-		 */
-		
-		List<String> listOfDb = getDatabases();
-		listOfDb.forEach(System.out::println);
-//		removeDatabase(listOfDb,db);
-//		listOfDb.forEach(System.out::println);
+		ArrayList<String> list = new ArrayList<String>() ;
+	      list.add("1");list.add("2");list.add("3");list.add("4");list.add("5");
+	      list.add("6");list.add("7");list.add("8");list.add("9");list.add("10");
+	      list.add("11");list.add("12");list.add("13");list.add("14");list.add("15");
+	      list.add("16");list.add("17");list.add("18");list.add("19");list.add("20");
+	      
+	      ArrayList<ArrayList<String>> myList = new ArrayList<ArrayList<String>>();
+	      int size = 5; 
+	      
+	      for(int i = 0 ; i <list.size() ; i = i+size){
+	          for(int r = i ; r < size+i; r++){
+	              System.out.println(list.get(r));
+	          }
+	      }
 	 
 
 	      
