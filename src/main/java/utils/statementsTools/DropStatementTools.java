@@ -27,7 +27,7 @@ public class DropStatementTools {
 			System.out.println("drop statement necessit more arguments :(");
 			return false;
 		}else if(array.length >4) {
-			System.out.println("invalid end of drop statement");
+			System.out.println("ERROR : invalid end of drop statement");
 			return false;
 		}
 		
@@ -44,6 +44,13 @@ public class DropStatementTools {
 				System.out.format("You have an error in your SQL syntax; %s is a reserved word",array[2]);
 				return false;
 			}
+			
+			//verify if the statement ended with ';'
+			if(!array[3].equals(";")) {
+				System.out.println("ERROR : missing ';' at the last of statement");
+				return false;
+			}
+			
 			switch(array[1]) {
 				case "table":{
 					String tableName =array[2];

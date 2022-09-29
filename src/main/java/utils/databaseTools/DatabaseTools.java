@@ -163,6 +163,9 @@ public class DatabaseTools {
 		}
 		
 		
+		//now we should delete files that ends with tableName_databaseName.owndb
+		deleteDatabaseTalbesFromDesktop(db);
+		
 	}
 
 
@@ -362,7 +365,35 @@ public class DatabaseTools {
 	}
 	
 	
+	public static boolean deleteDatabaseTalbesFromDesktop(String db) {
+		File folder = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/");
+		File[] listOfFiles = folder.listFiles();
 
+		for (File file : listOfFiles) {
+		    if (file.isFile()) {
+		        
+		        
+		        String fileName = file.getName();
+		       fileName= fileName.replace("_", "@").replace(".","@");
+		       
+		       String flTB [] = fileName.split("@");
+		       ArrayList<String> myArraylist = new ArrayList<String>() ;
+		       for(String str : flTB) {
+		    	   myArraylist.add(str);
+		       }
+		       
+		       if(myArraylist.contains(db)) {
+		    	   if(!file.delete())                      //returns Boolean value  
+		    	   {  
+		    		    System.out.println("ERROR : couldn't drop database :(");
+		    		    return false;//getting and printing the file name  
+		    	   }  
+		       }
+		    }
+		}
+		
+		return true;
+	}
 
 	
 	public static void main(String[] args) throws Exception {

@@ -27,36 +27,31 @@ public class Test {
 		File myObj = new File(tableFile);
 		
 		
-		//define a scanner object to read from the file
-		Scanner myReader = new Scanner(myObj);
-		ArrayList<String> saveOtherTables=new ArrayList<>() ;
-		
-		while (myReader.hasNextLine()) {
-			String data = myReader.nextLine();
-			String decryptedData=(CryptoUtils.decryptedData(data));
-			System.out.println(decryptedData);
-			
-			String trimedDatabaseName= decryptedData.substring
-						(decryptedData.indexOf("database=")+"database=".length(),decryptedData.indexOf(", numberOfColumns"));
-			System.out.println(trimedDatabaseName);
-			
-			if(!trimedDatabaseName.equalsIgnoreCase("spotify")){
-				saveOtherTables.add(decryptedData);
-			}
+		File folder = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/");
+		File[] listOfFiles = folder.listFiles();
+
+		for (File file : listOfFiles) {
+		    if (file.isFile()) {
+		        
+		        
+		        String fileName = file.getName();
+		       fileName= fileName.replace("_", "@").replace(".","@");
+		       System.out.println(fileName);
+		       String flTB [] = fileName.split("@");
+		       ArrayList<String> myArraylist = new ArrayList<String>() ;
+		       for(String str : flTB) {
+		    	   myArraylist.add(str);
+		       }
+		       
+		       if(myArraylist.contains("spotify")) {
+		    	   if(file.delete())                      //returns Boolean value  
+		    	   {  
+		    		   System.out.println(file.getName() + " deleted");   //getting and printing the file name  
+		    	   }  
+		       }
+		    }
 		}
 		
-		myReader.close();
-		//now we should delete the content of file 
-//		// clear the file
-//		BufferedWriter clearBuffer = new BufferedWriter(new FileWriter(new File(tableFile)));
-//		clearBuffer.write("");
-//		clearBuffer.close();
-//		
-//		//write the remaining tables to the file
-//		for(String str : saveOtherTables) {
-//			Tools.writeToFile(CryptoUtils.encryptData(str),tableFile);
-//		}
-//		
 		
 	
 	 
