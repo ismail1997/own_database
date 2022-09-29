@@ -24,7 +24,7 @@ public class DatabaseTools {
 
 	
 
-	public static void dropDatabase(String databaseName) throws Exception {
+	public static void dropDatabaseOldVersionDate29092022(String databaseName) throws Exception {
 		removeDatabase( databaseName);
 	}
 
@@ -80,6 +80,88 @@ public class DatabaseTools {
 		if(db.toLowerCase().equals(UseStatementTools.getTheCurrentSessionDatabase())) {//if the dropped database is the current selected database, we should clear the session
 			UseStatementTools.clearCurrentSession();
 		}
+		
+	}
+	
+	public static void dropDatabase(String db) throws Exception {
+		
+		List<Database> listOfDatabase = getListOfDatabases();
+		
+		int exist = 0 ;
+		for(int k = 0 ; k<listOfDatabase.size();k++) {
+			if(!listOfDatabase.get(k).getDatabaseName().equals(db)) {
+				exist++;
+			}
+		}
+		
+		if (exist == listOfDatabase.size()) {
+			System.out.format("can't drop database %s, database dosen't exist", db);
+			System.out.println("");
+			return;
+
+		}
+		
+		//remove the database from list and clear the file
+		List<Database> newRecordDatabase = new ArrayList<Database> ();
+		for(int i = 0 ; i< listOfDatabase.size() ; i++) {
+			if(!listOfDatabase.get(i).getDatabaseName().equals(db)) {
+				newRecordDatabase.add(listOfDatabase.get(i));
+			}
+		}
+
+		// clear the file
+		BufferedWriter clearBuffer = new BufferedWriter(new FileWriter(new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.DATABASE_FILE)));
+		clearBuffer.write("");
+		clearBuffer.close();
+
+		// save the new list to the file
+		
+		for (Database database : newRecordDatabase) {
+			createDatabase(database);
+		}
+		
+		System.out.println("database removed successfully");
+		
+		if(db.toLowerCase().equals(UseStatementTools.getTheCurrentSessionDatabase())) {//if the dropped database is the current selected database, we should clear the session
+			UseStatementTools.clearCurrentSession();
+		}
+		
+		//we should also remove all the tables linked to that database 
+		//also remove files that ends with table_removedDB.owndb
+		//for that we should go to the file tb.owndb and remove lines that contains the database name
+		String tableFile =FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.TABLES_FILES;
+		File myObj = new File(tableFile);
+		
+		
+		//define a scanner object to read from the file
+		Scanner myReader = new Scanner(myObj);
+		ArrayList<String> saveOtherTables=new ArrayList<>() ;
+		
+		while (myReader.hasNextLine()) {
+			String data = myReader.nextLine();
+			String decryptedData=(CryptoUtils.decryptedData(data));
+			
+			String trimedDatabaseName= decryptedData.substring
+						(decryptedData.indexOf("database=")+"database=".length(),decryptedData.indexOf(", numberOfColumns"));
+			
+			
+			if(!trimedDatabaseName.equalsIgnoreCase(db)){
+				saveOtherTables.add(decryptedData);
+			}
+		}
+		
+		myReader.close();
+		//now we should delete the content of file 
+		// clear the file
+		BufferedWriter clearBuffer2 = new BufferedWriter(new FileWriter(new File(tableFile)));
+		clearBuffer2.write("");
+		clearBuffer2.close();
+		
+		//write the remaining tables to the file
+		for(String str : saveOtherTables) {
+			Tools.writeToFile(CryptoUtils.encryptData(str),tableFile);
+		}
+		
 		
 	}
 

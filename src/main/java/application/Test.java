@@ -6,29 +6,59 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+import initpackage.FirstInit;
+import models.Database;
+import utils.Constants;
 import utils.CryptoUtils;
+import utils.Tools;
 
 public class Test {
 
 	public static void main(String[] args) throws Exception {
 		
-		ArrayList<String> list = new ArrayList<String>() ;
-	      list.add("1");list.add("2");list.add("3");list.add("4");list.add("5");
-	      list.add("6");list.add("7");list.add("8");list.add("9");list.add("10");
-	      list.add("11");list.add("12");list.add("13");list.add("14");list.add("15");
-	      list.add("16");list.add("17");list.add("18");list.add("19");list.add("20");
-	      
-	      ArrayList<ArrayList<String>> myList = new ArrayList<ArrayList<String>>();
-	      int size = 5; 
-	      
-	      for(int i = 0 ; i <list.size() ; i = i+size){
-	          for(int r = i ; r < size+i; r++){
-	              System.out.println(list.get(r));
-	          }
-	      }
+		
+		String databaseFile=FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ Constants.DATABASE_FILE;
+		String currentFile ="";
+		String tableFile ="C:\\Users\\pc\\myOwnDB\\tb.owndb";
+		File myObj = new File(tableFile);
+		
+		
+		//define a scanner object to read from the file
+		Scanner myReader = new Scanner(myObj);
+		ArrayList<String> saveOtherTables=new ArrayList<>() ;
+		
+		while (myReader.hasNextLine()) {
+			String data = myReader.nextLine();
+			String decryptedData=(CryptoUtils.decryptedData(data));
+			System.out.println(decryptedData);
+			
+			String trimedDatabaseName= decryptedData.substring
+						(decryptedData.indexOf("database=")+"database=".length(),decryptedData.indexOf(", numberOfColumns"));
+			System.out.println(trimedDatabaseName);
+			
+			if(!trimedDatabaseName.equalsIgnoreCase("spotify")){
+				saveOtherTables.add(decryptedData);
+			}
+		}
+		
+		myReader.close();
+		//now we should delete the content of file 
+//		// clear the file
+//		BufferedWriter clearBuffer = new BufferedWriter(new FileWriter(new File(tableFile)));
+//		clearBuffer.write("");
+//		clearBuffer.close();
+//		
+//		//write the remaining tables to the file
+//		for(String str : saveOtherTables) {
+//			Tools.writeToFile(CryptoUtils.encryptData(str),tableFile);
+//		}
+//		
+		
+	
 	 
 
 	      
