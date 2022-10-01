@@ -26,7 +26,8 @@ public class StatementTools {
 		}
 	}
 	public static boolean checkIfFirstKeyWordIsResevedWord(String keyWord) {
-		List<String> reservedWords = Arrays.asList("select","create","update","delete","insert","drop","truncate","show","use","desc","describe","shcdb");
+		List<String> reservedWords = Arrays.asList("select","create","update","delete","insert",
+				"drop","truncate","show","use","desc","describe","shcdb","limit");
 		boolean check = false;
 		for(String str : reservedWords) {
 			if(str.equals(keyWord.toLowerCase())) {

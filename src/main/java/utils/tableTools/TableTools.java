@@ -727,12 +727,242 @@ public class TableTools {
 
 	}
 
+	
+	
+	public static void readDataFromTableWithAsterixWithoutWhereWithLimit(String tableName,String databaseName,int limit) throws Exception {
+		// get the file in which databases are stored
+		File myObj = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ tableName + "_" + databaseName + ".owndb");
+		if (!myObj.exists()) {
+			System.out.println("table doesn't exist");
+			return;// Collections.emptyList();
+		}
+
+		// define a scanner object to read from the file
+		Scanner myReader = new Scanner(myObj);
+
+		// read the data from file and pass it to the split method
+		String header = myReader.nextLine();
+		String[] fields = CryptoUtils.decryptedData(header).split("\t\t");
+		ArrayList<String> flds = new ArrayList<String>();
+
+		for (String str : fields) {
+			flds.add(str.trim());
+		}
+
+		ArrayList<String> donnes = new ArrayList<String>();
+
+		ArrayList<ArrayList<String>> dataWithoutFields = new ArrayList<ArrayList<String>>();
+
+		
+		int stopReading = 0 ;
+		while (myReader.hasNextLine()) {
+			if(limit==0) break;
+			String data = myReader.nextLine();
+			String[] splitData = CryptoUtils.decryptedData(data).split("\t\t");
+			ArrayList<String> d = new ArrayList<String>();
+			for (String str : splitData) {
+				donnes.add(str.trim());
+				d.add(str);
+			}
+
+			dataWithoutFields.add(d);
+			stopReading++;
+			
+			if(stopReading==limit) break;
+
+		}
+		myReader.close();
+
+		donnes.addAll(flds);
+		ArrayList<Integer> maxSizeOfField = new ArrayList<>();
+
+		// System.out.println(findMaxLengthOfField(fieldsCollection(donnes,flds.size(),1)));
+		for (int r = 0; r < flds.size(); r++) {
+			maxSizeOfField.add(findMaxLengthOfField(fieldsCollection(donnes, flds.size(), r)));
+		}
+
+		String tableHead = "+";
+		String tableFieldDeclaration = "|";
+		for (int i = 0; i < maxSizeOfField.size(); i++) {
+			tableHead += "-" + Tools.repeatedString('-', maxSizeOfField.get(i)) + "-+";
+			tableFieldDeclaration += " " + flds.get(i)
+					+ Tools.repeatedString(' ', maxSizeOfField.get(i) - flds.get(i).length()) + " |";
+		}
+
+		System.out.println(tableHead);
+		System.out.println(tableFieldDeclaration);
+		System.out.println(tableHead);
+
+		String m = "|";
+		for (int r = 0; r < dataWithoutFields.size(); r++) {
+			for (int x = 0; x < dataWithoutFields.get(r).size(); x++) {
+				// System.out.println(dataWithoutFields.get(r).get(x));
+				m += " " + dataWithoutFields.get(r).get(x)
+						+ Tools.repeatedString(' ', maxSizeOfField.get(x) - dataWithoutFields.get(r).get(x).length())
+						+ " |";
+
+			}
+			System.out.println(m);
+			m = "|";
+
+		}
+		System.out.println(tableHead);
+
+		// System.out.println(dataWithoutFields);
+		return;// listOfDb;
+	}
+	public static void readDataFromTableWithFieldsWithoutWhereWithLimit(String tableName,String databaseName,ArrayList<String> fieldDeclared,int limit) throws Exception {
+		if (tableName == null || tableName.equals("") || tableName.equals(null) || databaseName.equals("")
+				|| databaseName.equals(null) || fieldDeclared.equals(null) || fieldDeclared == null
+				|| fieldDeclared.size() == 0) {
+			System.out.println("ERROR : You have error in your sql statement, check the manual of own_db");
+			return;
+		}
+
+		// get the file in which databases are stored
+		File myObj = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ tableName + "_" + databaseName + ".owndb");
+		if (!myObj.exists()) {
+			System.out.println("table doesn't exist");
+			return;// Collections.emptyList();
+		}
+
+		// define a scanner object to read from the file
+		Scanner myReader = new Scanner(myObj);
+
+		// read the data from file and pass it to the split method
+		String header = myReader.nextLine();
+		String[] fields = CryptoUtils.decryptedData(header).split("\t\t");
+		ArrayList<String> flds = new ArrayList<String>();
+		
+		for (String str : fields) {
+			flds.add(str.trim());
+		}
+		
+		
+		//now compare the fields of table with those who are passed as arguments 
+		for(String s : fieldDeclared) {
+			if(!flds.contains(s.toLowerCase())) {
+				System.out.format("ERROR : `%s` field doesn't exist in `%s` table.",s,tableName);
+				return;
+			}
+		}
+		
+		//make the passed fields to lower case 
+		fieldDeclared = (ArrayList<String>) fieldDeclared.stream().map(String::toLowerCase).collect(Collectors.toList());
+		
+		//add index of fields to a map
+		HashMap<Integer,String> fldMap = new HashMap<>();
+		for(int i = 0 ; i<flds.size(); i++) {
+			fldMap.put(i,flds.get(i));
+		}
+		
+		
+		
+		//test fields 
+		ArrayList<String> myFields = new ArrayList<String>();
+		ArrayList<ArrayList<String>> dataWithoutFields = new ArrayList<ArrayList<String>>();
+		
+		int sizeOfData = 0 ;
+		int stopCounting = 0;
+		//read the whole data from file 
+		while (myReader.hasNextLine()) {
+			if(limit ==0) break;
+			String data = myReader.nextLine();
+			String[] splitData = CryptoUtils.decryptedData(data).split("\t\t");
+			ArrayList<String> d = new ArrayList<String>();
+			for (String str : splitData) {
+				
+				d.add(str);
+			}
+			myFields.addAll(d);
+			sizeOfData++;
+			stopCounting++;
+			if(stopCounting==limit) {
+				break;
+			}
+
+		}
+		
+		//System.out.println("----------------------------");
+		//System.out.println(myFields);
+		
+		ArrayList<Integer> indexThatDeclared = new ArrayList<> () ;//here we declare the index that we would get from table
+		
+		for(int k = 0 ; k< fieldDeclared.size() ; k++) {
+			indexThatDeclared.add(Tools.getKeyOfValueFromMap(fldMap, fieldDeclared.get(k)));
+		}
+		
+		//System.out.println(indexThatDeclared);
+		
+		
+		ArrayList<ArrayList<String>> groupementField = getFieldsGroupement(myFields, indexThatDeclared,flds.size() );
+		//System.out.println(groupementField);
+		
+		dataWithoutFields=getFieldsGroupement(myFields, indexThatDeclared,flds.size() );
+	
+		for(int i = 0 ; i< groupementField.size() ; i++) {
+			groupementField.get(i).add(fieldDeclared.get(i));
+		}
+		
+		//get the max of fields now 
+		ArrayList<Integer> maxFields = new ArrayList<>();
+		for(int i = 0 ; i< groupementField.size() ; i ++) {
+			maxFields.add(findMaxLengthOfField(groupementField.get(i)));
+		}
+		
+		
+		ArrayList<String> allData = new ArrayList<String>();
+		for(int l = 0; l < dataWithoutFields.size() ; l++) {
+			for( int m = 0 ; m<dataWithoutFields.get(0).size();m++) {
+				allData.add(dataWithoutFields.get(l).get(m));
+			}
+		}
+ 		
+		
+		
+		myReader.close();
+		
+		
+		String tableHead = "+";
+		String tableFieldDeclaration = "|";
+		for (int i = 0; i < maxFields.size(); i++) {
+			tableHead += "-" + Tools.repeatedString('-', maxFields.get(i)) + "-+";
+			tableFieldDeclaration += " " + fieldDeclared.get(i)
+					+ Tools.repeatedString(' ', maxFields.get(i) - fieldDeclared.get(i).length()) + " |";
+		}
+
+		System.out.println(tableHead);
+		System.out.println(tableFieldDeclaration);
+		System.out.println(tableHead);
+		
+		
+		
+		String m = "|";
+		
+		for(int r= 0 ; r<sizeOfData;r++) {
+			for(int j = r ; j <allData.size(); j=j+sizeOfData) {
+				int indexOfField = (j/sizeOfData);
+				int sizeOfRepeatedCharacter = maxFields.get(indexOfField)-allData.get(j).length() ;
+				
+				//System.out.println("index="+sizeOfRepeatedCharacter);
+				m+=" "+allData.get(j)+Tools.repeatedString(' ', sizeOfRepeatedCharacter)+" |";
+				
+			}
+			System.out.println(m);
+			m="|";
+		}
+		System.out.println(tableHead);
+
+	}
+	
+	
 	public static void main(String[] args) throws Exception {
 		ArrayList<String> list = new ArrayList<String>() ; 
-		list.addAll(Arrays.asList("firstname","id","email"));
+		list.addAll(Arrays.asList("firstname","id","email","id"));
 
 
-		readDataFromTableWithFieldsWithoutWhereClause("users", "mydb",list);
+		readDataFromTableWithFieldsWithoutWhereWithLimit("user", "mydb",list,02);
+		
 
 	}
 
