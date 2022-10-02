@@ -10,6 +10,7 @@ import utils.statementsTools.InsertStatementTools;
 import utils.statementsTools.SelectStatementTools;
 import utils.statementsTools.ShowStatementTools;
 import utils.statementsTools.StatementTools;
+import utils.statementsTools.TruncateStatementTools;
 import utils.statementsTools.UseStatementTools;
 
 public class Main {
@@ -55,6 +56,8 @@ public class Main {
 							SelectStatementTools.validSelectStatement(statement);
 						}else if(keyWord.toLowerCase().equals("shcdb")) {
 							UseStatementTools.showCurrentDatabase (statement);
+						}else if(keyWord.toLowerCase().equals("truncate")) {
+							TruncateStatementTools.validTruncateStatement(statement);
 						}
 						
 					}

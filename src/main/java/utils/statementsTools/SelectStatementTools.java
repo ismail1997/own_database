@@ -162,8 +162,12 @@ public class SelectStatementTools {
 		String chosenSelect = statement.toLowerCase().replaceAll("\\s+"," ").trim();
 		String selectKeyword=chosenSelect.toLowerCase().trim();
 			   selectKeyword=selectKeyword.substring(selectKeyword.indexOf("select"),"select".length());
-			   
-			   
+			
+		//now we should get table informations 
+		String currentDatabase =UseStatementTools.getTheCurrentSessionDatabase(); //get the current selected database
+	    if(currentDatabase.equals("") || currentDatabase==null) {
+	    	System.out.println("No database selected");return;
+	    }
 	    //we should verify if the string is ended with ;
 	    String end = ""+chosenSelect.charAt(chosenSelect.length()-1);
 	    if(!end.equals(";")) {
@@ -300,8 +304,7 @@ public class SelectStatementTools {
 	    	System.out.println("ERROR : invalid limit number ["+limitNumber+"] for select statement");return;
 	    }
 	    
-	    //now we should get table informations 
-	    String currentDatabase =UseStatementTools.getTheCurrentSessionDatabase(); //get the current selected database
+	    
 		
 		Table table = TableTools.getTable(tableName,currentDatabase);//check if the table exists in the database
 		if(table == null){
