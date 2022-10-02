@@ -955,15 +955,46 @@ public class TableTools {
 
 	}
 	
-	
-	public static void main(String[] args) throws Exception {
-		ArrayList<String> list = new ArrayList<String>() ; 
-		list.addAll(Arrays.asList("firstname","id","email","id"));
-
-
-		readDataFromTableWithFieldsWithoutWhereWithLimit("user", "mydb",list,02);
+	public static ArrayList<Integer> getTheIDsIfPrimaryKey(String tableName,String databaseName) throws Exception{
 		
+		File myObj = new File(FirstInit.USER_HOME_DIRECTORY+"/"+FirstInit.DB_FILE_NAME+"/"+ tableName + "_" + databaseName + ".owndb");
+		if (!myObj.exists()) {
+			System.out.println("table doesn't exist");
+			throw new RuntimeException("System ERROR, :(");// Collections.emptyList();
+		}
 
+		// define a scanner object to read from the file
+		Scanner myReader = new Scanner(myObj);
+
+		// read the data from file and pass it to the split method
+		String header = myReader.nextLine();
+		String [] splitHeader = CryptoUtils.decryptedData(header).split("\t\t");
+		ArrayList<String> listToGetID = new ArrayList<>();
+		for(String str : splitHeader)
+		{
+			listToGetID.add(str.trim());
+		}
+		int indexOfId = listToGetID.indexOf("id");
+		
+		ArrayList<Integer> ids = new ArrayList<> () ;
+		while (myReader.hasNextLine()) {
+			String data = myReader.nextLine();
+			String[] splitData = CryptoUtils.decryptedData(data).split("\t\t");
+			ids.add(Integer.valueOf(splitData[indexOfId]));
+
+		}
+		myReader.close();
+
+		return ids;
+	}
+	public static void main(String[] args) throws Exception {
+//		ArrayList<String> list = new ArrayList<String>() ; 
+//		list.addAll(Arrays.asList("firstname","id","email","id"));
+//
+//
+//		readDataFromTableWithFieldsWithoutWhereWithLimit("user", "mydb",list,02);
+		System.out.println(
+		getTheIDsIfPrimaryKey("user", "mydb"));
 	}
 
 	public static ArrayList<String> fieldsCollection(ArrayList<String> list, int size, int firstFieldIndex) {

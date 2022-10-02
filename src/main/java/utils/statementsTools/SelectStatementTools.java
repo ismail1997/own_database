@@ -10,6 +10,7 @@ import utils.Tools;
 import utils.tableTools.TableTools;
 
 public class SelectStatementTools {
+
 	public static void validSelectStatementOLDVERSION(String statement) throws Exception {
 		String chosenSelect = statement.toLowerCase().replaceAll("\\s+"," ").trim();
 		String selectKeyword=chosenSelect.toLowerCase().trim();
