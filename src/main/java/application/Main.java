@@ -58,6 +58,8 @@ public class Main {
 							UseStatementTools.showCurrentDatabase (statement);
 						}else if(keyWord.toLowerCase().equals("truncate")) {
 							TruncateStatementTools.validTruncateStatement(statement);
+						}else if(keyWord.toLowerCase().equals("update")) {
+							
 						}
 						
 					}

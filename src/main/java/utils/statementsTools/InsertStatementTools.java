@@ -8,6 +8,7 @@ import utils.tableTools.TableTools;
 
 import javax.tools.Tool;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,14 +18,14 @@ public class InsertStatementTools {
 
 
 	public static void main(String [] args) throws Exception {
-		String statement ="insert into user (email,id) values ('lm',4333)|('mDE',770) ;";
+		String statement ="insert into user (email,id) values ('sze',437)|('zex',790) ;";
 		String currentDatabase =UseStatementTools.getTheCurrentSessionDatabase(); //get the current selected database
-
+		currentDatabase="mydb";
 		if(currentDatabase.equals("") || currentDatabase.equals(null)) {
 			System.out.println("No database selected :-(");return;
 		}
 		
-		currentDatabase="mydb";
+		
 		/**
 		 * first we split the string into two strings : one is 'insert into table_name (columns)'
 		 * 											    second is 'values (value1,value3)
@@ -143,14 +144,27 @@ public class InsertStatementTools {
 			insertWithSomeFieldsDeclared(fields, columns, table, idPrimaryKey, secondPartString, currentDatabase);
 		
 		}else if (columns.length < fields.size()) {
-			for(String str : columns) {
-				System.out.println(str);
-			}
-			for(Field str : fields) System.out.println(str);
+			
+			
+			
+			
 			
 			ArrayList<String> fieldsAsString = new ArrayList<String>();
 			for(Field fi : fields) {fieldsAsString.add(fi.getFieldName());}//convert fields to string list to compare it with statement
-			//System.out.println(fieldsAsString);
+			
+			
+			ArrayList<String> listToPreventDuplicateFields = new ArrayList<String> () ;
+			for(String sr : columns) {
+				if(listToPreventDuplicateFields.contains(sr.trim())) {
+					System.out.format("ERROR : Column '%s' specified twice%n",sr);return;
+				}
+				listToPreventDuplicateFields.add(sr.trim());
+			}
+			
+			ArrayList<String> fieldsThatDeclared = new ArrayList<String>() ;
+			for(String col : columns) fieldsThatDeclared.add(col);
+			
+			
 			
 			for(String col : columns) {//verify if the columns are the same
 				col=col.trim();
@@ -159,6 +173,18 @@ public class InsertStatementTools {
 					return;
 				}
 			}
+			
+			//check the fields that are not declared
+			ArrayList<String> notDeclaredFields= new ArrayList<>();
+			for(String str : fieldsAsString) {
+				if(!fieldsThatDeclared.contains(str.trim())) {
+					notDeclaredFields.add(str);
+				}
+				
+			}
+			
+
+			
 			
 			if(fieldsAsString.contains("id")) {
 				Field idField = fields.stream().filter(x->x.getFieldName().equals("id")).findAny().orElse(null);
@@ -191,6 +217,7 @@ public class InsertStatementTools {
 			
 			//now we should get all values into one list of list to iterate over it 
 			//  [ [value1],[value2],...]
+			
 			ArrayList<String> vals = new ArrayList<String>();
 			for(String string : stringValueParts) {
 				String verifiedStr = string.replace("(", "");
@@ -200,8 +227,31 @@ public class InsertStatementTools {
 				vals.add(verifiedStr);
 			}
 			
+			
 			System.out.println(vals);
 			
+			//now we should get the type of fields that not declared 
+			for(String f : notDeclaredFields) {
+				String s =TableTools.getTypeOfField(f, table.getTableName(), currentDatabase);
+				System.out.println(s);
+			}
+			ArrayList<String> d =defaultValueByType(notDeclaredFields, table, currentDatabase);
+
+			
+			for(int e = 0 ; e<vals.size();e++) {
+				String str = vals.get(e);
+				String sl="";
+				for(int k = 0 ; k< d.size();k++) {
+					sl+="<>"+d.get(k);
+				}
+				vals.set(e,str+sl);
+			}
+			
+			System.out.println(vals);
+
+			ArrayList<String> cols = new ArrayList<String> ();for(String col : columns) cols.add(col);
+			cols.addAll(notDeclaredFields);
+			System.out.println(cols);
 			ArrayList<Integer> duplicateID = new ArrayList<>();
 			//System.out.println(vals);
 			ArrayList<ArrayList<String>> listOfValues = new ArrayList<ArrayList<String>>();
@@ -217,7 +267,7 @@ public class InsertStatementTools {
 					String fld =splitedStr[k].trim();
 					
 					
-					String typeOfField = TableTools.getTypeOfField(columns[k].trim(), table.getTableName(), table.getDatabase());
+					String typeOfField = TableTools.getTypeOfField(cols.get(k).trim(), table.getTableName(), table.getDatabase());
 					
 					switch(typeOfField) {
 						case "int":{
@@ -229,7 +279,7 @@ public class InsertStatementTools {
 									
 									//check if the field is id and primary key
 									//then we should retrieve all IDS to show if it is not repeated
-									if(columns[k].trim().equals("id") && idPrimaryKey) {
+									if(cols.get(k).trim().equals("id") && idPrimaryKey) {
 										ArrayList<Integer> ids=TableTools.getTheIDsIfPrimaryKey(table.getTableName(), currentDatabase);
 										
 										int id = Integer.valueOf(fld);
@@ -246,7 +296,7 @@ public class InsertStatementTools {
 										}
 									}
 									
-									valeurs.add(columns[k].trim()+":"+fld);
+									valeurs.add(cols.get(k).trim()+":"+fld);
 									break;
 								}
 							}else {//if the field is not numeric then throw an error 
@@ -256,7 +306,7 @@ public class InsertStatementTools {
 						case "double":{
 							if(Tools.isNumeric(fld.trim())) {//check if the field is numeric ( integer or double ) 
 								//System.out.println(fld+" : is double");
-								valeurs.add(columns[k].trim()+":"+fld);
+								valeurs.add(cols.get(k).trim()+":"+fld);
 								break;
 							}else {
 								System.out.println("ERROR : Invalid type, expected doube but given other type");return ;
@@ -274,11 +324,11 @@ public class InsertStatementTools {
 						default:{//the default type is String
 							if(fld.startsWith("'") && fld.endsWith("'")) {
 								//System.out.println(fld+ " : is string");
-								valeurs.add(columns[k].trim()+":"+fld);
+								valeurs.add(cols.get(k).trim()+":"+fld);
 								break;
 							}else if(fld.startsWith("\"") && fld.endsWith("\"")) {
 								//System.out.println(fld+ " : is string");
-								valeurs.add(columns[k].trim()+":"+fld);
+								valeurs.add(cols.get(k).trim()+":"+fld);
 								break;
 							}else {
 								System.out.println("ERROR : You have an error in your SQL syntax near "+fld);return ;
@@ -313,8 +363,8 @@ public class InsertStatementTools {
 			            //System.out.println(key +" = "+map.get(key));
 					 dataToBeSaved+=map.get(key)+"\t\t";
 			     }
-				// TableTools.createTableData(table,dataToBeSaved);
-				 System.out.println(dataToBeSaved);
+				 TableTools.createTableData(table,dataToBeSaved);
+				 //System.out.println(dataToBeSaved);
 			}
 			
 		}
@@ -449,12 +499,240 @@ public class InsertStatementTools {
 			
 			
 		}else if(columns.length ==0){
-			insertWithSomeFieldsDeclared(fields, columns, table, idPrimaryKey, secondPartString, currentDatabase);
+			insertWithNoFieldsDeclared(fields, columns, table, idPrimaryKey, secondPartString, currentDatabase);
 		
 		}else if (columns.length < fields.size()) {
+			insertWithSomeFieldsDeclared(fields, columns, table, idPrimaryKey, secondPartString, currentDatabase);
+		}
+		
+	}
+	
+	
+	public static void insertWithSomeFieldsDeclared(List<Field> fields,String [] columns,Table table,boolean idPrimaryKey,
+			String secondPartString, String currentDatabase) throws Exception {
+
+		ArrayList<String> fieldsAsString = new ArrayList<String>();
+		for(Field fi : fields) {fieldsAsString.add(fi.getFieldName());}//convert fields to string list to compare it with statement
+		
+		
+		ArrayList<String> listToPreventDuplicateFields = new ArrayList<String> () ;
+		for(String sr : columns) {
+			if(listToPreventDuplicateFields.contains(sr.trim())) {
+				System.out.format("ERROR : Column '%s' specified twice%n",sr);return;
+			}
+			listToPreventDuplicateFields.add(sr.trim());
+		}
+		
+		ArrayList<String> fieldsThatDeclared = new ArrayList<String>() ;
+		for(String col : columns) fieldsThatDeclared.add(col);
+		
+		
+		
+		for(String col : columns) {//verify if the columns are the same
+			col=col.trim();
+			if(!fieldsAsString.contains(col)) {
+				System.out.println("ERROR : '"+col+"' field doesn't exist in the "+table.getTableName()+" table.");
+				return;
+			}
+		}
+		
+		//check the fields that are not declared
+		ArrayList<String> notDeclaredFields= new ArrayList<>();
+		for(String str : fieldsAsString) {
+			if(!fieldsThatDeclared.contains(str.trim())) {
+				notDeclaredFields.add(str);
+			}
 			
 		}
 		
+
+		
+		
+		if(fieldsAsString.contains("id")) {
+			Field idField = fields.stream().filter(x->x.getFieldName().equals("id")).findAny().orElse(null);
+			if(idField.getPrimaryKey().equals("pk")) {
+				idPrimaryKey=true;
+			}
+		}
+		
+		
+		
+		
+		//now we should check the second part, the values part : 'values (1,'ISMAIL','ISMAIL@GMAIL.COM' ),(...)
+		
+		//System.out.println(secondPartString);
+		//we should verify the cardinal of values is the same as cardinal of column declaration
+		// for example if the columns are (id,email,price) the values should be (1,"h","h") not (1,"y","y","y")
+		//for that we should split the value part into multiple parts 
+		String [] stringValueParts = secondPartString.split("\\|");
+		//for(String str : stringValueParts) System.out.println(str);
+		
+		int i = 1;
+		for(String string : stringValueParts) {
+			String cardinalValues [] = string.split(",");
+			if(columns.length != cardinalValues.length) {//in this part we verify the count of column and value
+				System.out.println("ERROR : Column count doesn't match value count at row "+i);
+				return ;
+			}
+			i++;
+			}
+		
+		//now we should get all values into one list of list to iterate over it 
+		//  [ [value1],[value2],...]
+		
+		ArrayList<String> vals = new ArrayList<String>();
+		for(String string : stringValueParts) {
+			String verifiedStr = string.replace("(", "");
+				   verifiedStr = verifiedStr.replace(")", "");
+				   verifiedStr = verifiedStr.replace(";", "");
+				   verifiedStr = verifiedStr.replace(",", "<>");
+			vals.add(verifiedStr);
+		}
+		
+		
+		
+		//now we should get the type of fields that not declared 
+		ArrayList<String> d =defaultValueByType(notDeclaredFields, table, currentDatabase);
+
+		
+		for(int e = 0 ; e<vals.size();e++) {
+			String str = vals.get(e);
+			String sl="";
+			for(int k = 0 ; k< d.size();k++) {
+				sl+="<>"+d.get(k);
+			}
+			vals.set(e,str+sl);
+		}
+		
+
+		ArrayList<String> cols = new ArrayList<String> ();for(String col : columns) cols.add(col);
+		cols.addAll(notDeclaredFields);
+		
+		ArrayList<Integer> duplicateID = new ArrayList<>();
+		ArrayList<ArrayList<String>> listOfValues = new ArrayList<ArrayList<String>>();
+		ArrayList<String> valeurs = new ArrayList<String>();
+		
+		
+		for(String s : vals) {
+			String splitedStr [] = s.split("<>");
+			for(int k = 0 ; k<splitedStr.length;k++) {
+				//System.out.println(splitedStr[k]+"   type of field is  "+
+						//TableTools.getTypeOfField(fieldsAsString.get(k), table.getTableName(), table.getDatabase()));
+				
+				String fld =splitedStr[k].trim();
+				
+				
+				String typeOfField = TableTools.getTypeOfField(cols.get(k).trim(), table.getTableName(), table.getDatabase());
+				
+				switch(typeOfField) {
+					case "int":{
+						if(Tools.isNumeric(fld.trim()) || fld.trim().equals("null")) {//check if the field is numeric ( integer or double ) 
+							if(fld.contains(".")) {
+								System.out.println("ERROR : Invalid type, expected integer but given double");return;
+							}else {//check now if the field is a primary key or not and if the auto incremented is activated
+								//System.out.println(fld+" : is integer");
+								
+								//check if the field is id and primary key
+								//then we should retrieve all IDS to show if it is not repeated
+								if(!fld.trim().equals("null")) {
+									if(cols.get(k).trim().equals("id") && idPrimaryKey) {
+										ArrayList<Integer> ids=TableTools.getTheIDsIfPrimaryKey(table.getTableName(), currentDatabase);
+										
+										int id = Integer.valueOf(fld);
+										if(ids.contains(id)) {
+											System.out.format("Duplicate entry '%s' for key '%s.PRIMARY'%n",id,table.getTableName()
+												);
+											return;
+										}
+										if(duplicateID.contains(id)) {
+											System.out.format("Duplicate entry '%s' for key '%s.PRIMARY'%n",id,table.getTableName());
+											return;
+										}else {
+											duplicateID.add(id);
+										}
+									}
+								}
+								if(fld.trim().equals("null") && cols.get(k).trim().equals("id") && idPrimaryKey ) {
+									ArrayList<Integer> ls = TableTools.getTheIDsIfPrimaryKey(table.getTableName(), currentDatabase);
+									Integer max =null;
+									if(ls.size() != 0) {
+										max =ls.stream().max(Comparator.comparing(Integer::valueOf))
+								          .get();
+										max++;
+									}
+									if(max==null) max=1;
+									fld=""+max;
+								}
+								
+								valeurs.add(cols.get(k).trim()+":"+fld);
+								break;
+							}
+						}else {//if the field is not numeric then throw an error 
+							System.out.println("ERROR : Invalid type, expected integer but given other type");return ;
+						}
+					}
+					case "double":{
+						if(Tools.isNumeric(fld.trim())) {//check if the field is numeric ( integer or double ) 
+							//System.out.println(fld+" : is double");
+							valeurs.add(cols.get(k).trim()+":"+fld);
+							break;
+						}else {
+							System.out.println("ERROR : Invalid type, expected doube but given other type");return ;
+						}
+					}
+					case "char":{//TODO  add char handling 
+						break;
+					}
+					case "date":{//TODO add date handling 
+						break;
+					}
+					case "boolean":{//TODO add boolean handling 
+						break;
+					}
+					default:{//the default type is String
+						if(fld.startsWith("'") && fld.endsWith("'")) {
+							//System.out.println(fld+ " : is string");
+							valeurs.add(cols.get(k).trim()+":"+fld);
+							break;
+						}else if(fld.startsWith("\"") && fld.endsWith("\"")) {
+							//System.out.println(fld+ " : is string");
+							valeurs.add(cols.get(k).trim()+":"+fld);
+							break;
+						}else {
+							System.out.println("ERROR : You have an error in your SQL syntax near "+fld);return ;
+						}
+						
+					}
+				}
+			}
+			
+			listOfValues.add(valeurs);
+			valeurs=new ArrayList<>();
+		}
+		
+		
+		
+		for(int z = 0 ; z< listOfValues.size();z++) {
+			
+			Map<Integer,String> map = new HashMap<Integer,String>();
+			
+			for(int x = 0 ; x< listOfValues.get(z).size(); x++) {
+				String myField = listOfValues.get(z).get(x);
+				String fieldName = myField.substring(0,myField.indexOf(":"));
+				String fieldValue= myField.substring(myField.indexOf(":")+1,myField.length());
+				int indexOfFieldInTableFields = fieldsAsString.indexOf(fieldName);
+				//System.out.println(indexOfFieldInTableFields+" value :"+fieldValue);
+				map.put(indexOfFieldInTableFields,fieldValue);
+			}
+			map=Tools.sortByKeys(map);
+			String dataToBeSaved="";
+			 for (Integer key: map.keySet()){
+		            //System.out.println(key +" = "+map.get(key));
+				 dataToBeSaved+=map.get(key)+"\t\t";
+		     }
+			 TableTools.createTableData(table,dataToBeSaved);
+		}
+		System.out.println("Query OK, "+listOfValues.size()+" row affected");return;
 	}
 	
 	public static void insertWithAllfieldsDeclared(List<Field> fields,String [] columns,Table table,boolean idPrimaryKey,
@@ -635,7 +913,7 @@ public class InsertStatementTools {
 		
 	}
 
-	public static void insertWithSomeFieldsDeclared(List<Field> fields,String [] columns,Table table,boolean idPrimaryKey,
+	public static void insertWithNoFieldsDeclared(List<Field> fields,String [] columns,Table table,boolean idPrimaryKey,
 							String secondPartString, String currentDatabase) throws Exception {
 
 		ArrayList<String> fieldsAsString = new ArrayList<String>();
@@ -783,18 +1061,37 @@ public class InsertStatementTools {
 
 
 
-
-
-
-
-
 	
 	
 	
 	
 	
-	
-	
+	public static ArrayList<String> defaultValueByType(ArrayList<String> fields,Table table,String db) throws Exception{
+		ArrayList<String> list = new ArrayList<String> () ;
+		for(String f : fields) {
+			String s =TableTools.getTypeOfField(f, table.getTableName(), db);
+			
+			switch(s) {
+				case "string":{
+					list.add("''");
+					break;
+				}
+				case "int" :{
+					list.add("null");
+					break;
+				}
+				case "double":{
+					list.add("null");
+					break;
+				}
+				default:{
+					list.add("''");break;
+				}
+			}
+		}
+		return list;
+		
+	}
 	
 	
 	
