@@ -26,91 +26,18 @@ import utils.tableTools.TableTools;
 public class Test {
 
 	public static void main(String[] args) throws Exception {
-		String databaseName="mydb";
-		String tableName="user";
-		String field="age";
-		String vl   ="34";
-		// get the file in which databases are stored
-				File myObj = new File(FirstInit.USER_HOME_DIRECTORY + "/" + FirstInit.DB_FILE_NAME + "/" + tableName + "_"
-						+ databaseName + ".owndb");
-				if (!myObj.exists()) {
-					System.out.println("table doesn't exist");
-					return;// Collections.emptyList();
-				}
-
-				// define a scanner object to read from the file
-				Scanner myReader = new Scanner(myObj);
-
-				// read the data from file and pass it to the split method
-				String header = myReader.nextLine();
-				String[] fields = CryptoUtils.decryptedData(header).split("\t\t");
-				ArrayList<String> flds = new ArrayList<String>();
-
-				for (String str : fields) {
-					flds.add(str.trim());
-				}
-				
-				int indexOfField=flds.indexOf(field);
-
-				ArrayList<String> donnes = new ArrayList<String>();
-
-				ArrayList<ArrayList<String>> dataWithoutFields = new ArrayList<ArrayList<String>>();
-
-				while (myReader.hasNextLine()) {
-					String data = myReader.nextLine();
-					String[] splitData = CryptoUtils.decryptedData(data).split("\t\t");
-					ArrayList<String> d = new ArrayList<String>();
-					
-					if(splitData[indexOfField].equals(vl)) {
-						for (String str : splitData) {
-							donnes.add(str.trim());
-							d.add(str);
-						}
-						
-						dataWithoutFields.add(d);
-					}
-
-				}
-				
-				myReader.close();
-
-				donnes.addAll(flds);
-				ArrayList<Integer> maxSizeOfField = new ArrayList<>();
-
-				// System.out.println(findMaxLengthOfField(fieldsCollection(donnes,flds.size(),1)));
-				for (int r = 0; r < flds.size(); r++) {
-					maxSizeOfField.add(TableTools.findMaxLengthOfField(TableTools.fieldsCollection(donnes, flds.size(), r)));
-				}
-
-				String tableHead = "+";
-				String tableFieldDeclaration = "|";
-				for (int i = 0; i < maxSizeOfField.size(); i++) {
-					tableHead += "-" + Tools.repeatedString('-', maxSizeOfField.get(i)) + "-+";
-					tableFieldDeclaration += " " + flds.get(i)
-							+ Tools.repeatedString(' ', maxSizeOfField.get(i) - flds.get(i).length()) + " |";
-				}
-
-				System.out.println(tableHead);
-				System.out.println(tableFieldDeclaration);
-				System.out.println(tableHead);
-
-				String m = "|";
-				for (int r = 0; r < dataWithoutFields.size(); r++) {
-					for (int x = 0; x < dataWithoutFields.get(r).size(); x++) {
-						// System.out.println(dataWithoutFields.get(r).get(x));
-						m += " " + dataWithoutFields.get(r).get(x)
-								+ Tools.repeatedString(' ', maxSizeOfField.get(x) - dataWithoutFields.get(r).get(x).length())
-								+ " |";
-
-					}
-					System.out.println(m);
-					m = "|";
-
-				}
-				System.out.println(tableHead);
-
-				// System.out.println(dataWithoutFields);
-				return;// listOfDb;
+		String fileName=FirstInit.USER_HOME_DIRECTORY + "/" + FirstInit.DB_FILE_NAME + "/user" + 
+		"_" + "mydb.owndb";
+		File myObj = new File(fileName);
+		
+		Scanner scanner = new Scanner (myObj);
+		
+		while(scanner.hasNext()) {
+			String data = scanner.nextLine();
+			data= CryptoUtils.decryptedData(data);
+			
+			System.out.println(data);
+		}
 		
 		
 	}

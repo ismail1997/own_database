@@ -375,11 +375,11 @@ public class SelectStatementTools {
 	    	fieldThatPassedForWhere=fieldThatPassedForWhere.trim();
 	    }
 		String [] fieldAndValue=fieldThatPassedForWhere.split("=");//make the field and value in table [id,2]
-	    if(fieldAndValue.length !=2) {
+	    if(containsWhereClause && fieldAndValue.length !=2) {
 	    	System.out.println("ERROR : invalid where clause arguments");return;
 	    }
 	    //now we should verify that the field exists in the table fields 
-	    if(!nameOfFields.contains(fieldAndValue[0].trim())) {
+	    if(containsWhereClause && !nameOfFields.contains(fieldAndValue[0].trim())) {
 	    	System.out.println("ERROR : the field"+fieldAndValue[0]+" doesn't exist in "+tableName);return;
 	    }
 		

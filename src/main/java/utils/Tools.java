@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -113,6 +114,12 @@ public class Tools {
                 .orElse(null);
     }
  
+    
+    public static void clearFile(String fileName) throws Exception {
+    	BufferedWriter bfWriter = new BufferedWriter(new FileWriter(new File(fileName)));
+    	bfWriter.write("");
+    	bfWriter.close();
+    }
 	
 	public static void main(String[] args) {
 		ArrayList<String> list= new ArrayList<String> (); list.addAll(Arrays.asList("select","select","select","*","*"));

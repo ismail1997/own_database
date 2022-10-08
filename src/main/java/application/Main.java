@@ -11,6 +11,7 @@ import utils.statementsTools.SelectStatementTools;
 import utils.statementsTools.ShowStatementTools;
 import utils.statementsTools.StatementTools;
 import utils.statementsTools.TruncateStatementTools;
+import utils.statementsTools.UpdateStatementTools;
 import utils.statementsTools.UseStatementTools;
 
 public class Main {
@@ -59,7 +60,7 @@ public class Main {
 						}else if(keyWord.toLowerCase().equals("truncate")) {
 							TruncateStatementTools.validTruncateStatement(statement);
 						}else if(keyWord.toLowerCase().equals("update")) {
-							
+							UpdateStatementTools.validUpdateStatement(statement);
 						}
 						
 					}
