@@ -4,6 +4,7 @@ package application;
 import java.util.Scanner;
 
 import utils.statementsTools.CreateStatementTools;
+import utils.statementsTools.DeleteStatementTools;
 import utils.statementsTools.DescStatementTools;
 import utils.statementsTools.DropStatementTools;
 import utils.statementsTools.InsertStatementTools;
@@ -61,6 +62,8 @@ public class Main {
 							TruncateStatementTools.validTruncateStatement(statement);
 						}else if(keyWord.toLowerCase().equals("update")) {
 							UpdateStatementTools.validUpdateStatement(statement);
+						}else if(keyWord.toLowerCase().equals("delete")) {
+							DeleteStatementTools.validDeleteStatement(statement);
 						}
 						
 					}
